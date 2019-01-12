@@ -7,11 +7,8 @@ import Header from "./components/UI/header";
 
 import { BrowserRouter, Route } from "react-router-dom";
 
-import mixpanel from "./config/mixpanel";
-
 class App extends Component {
   render() {
-    mixpanel.track("test2");
     return (
       <BrowserRouter>
         <React.Fragment>
