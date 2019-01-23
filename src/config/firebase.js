@@ -6,9 +6,15 @@ import { FirebaseConfig } from "./keys.js";
 
 firebase.initializeApp(FirebaseConfig);
 
-export const firestore = firebase.firestore();
+const firestore = firebase.firestore();
+firestore.settings({
+  timestampsInSnapshots: true
+});
+firestore.enablePersistence();
 
-export const storage = firebase.storage().ref();
-export const provider = new firebase.auth.GoogleAuthProvider();
-export const auth = firebase.auth();
-export const per = firebase.auth.Auth.Persistence.LOCAL;
+const storage = firebase.storage().ref();
+const provider = new firebase.auth.GoogleAuthProvider();
+const auth = firebase.auth();
+const per = firebase.auth.Auth.Persistence.LOCAL;
+
+export { firestore, storage, provider, auth, per };
