@@ -7,9 +7,7 @@ import { FirebaseConfig } from "./keys.js";
 firebase.initializeApp(FirebaseConfig);
 
 const firestore = firebase.firestore();
-firestore.settings({
-  timestampsInSnapshots: true
-});
+
 firestore.enablePersistence();
 
 const storage = firebase.storage().ref();

@@ -8,7 +8,7 @@ export const testfunc = ub => {
       // console.log("unsub");
       ub();
     }
-    var fakeinput = [["tag.New", "==", true]];
+    var fakeinput = [["tag.Blog", "==", true]];
     var query = firestore.collection("docs");
 
     for (var i in fakeinput) {
@@ -17,7 +17,7 @@ export const testfunc = ub => {
 
     var benchmark = Date.now();
 
-    var unsubscribe = query.orderBy("static").onSnapshot(function(snap) {
+    var unsubscribe = query.onSnapshot(function(snap) {
       snap.docChanges().forEach(function(change) {
         console.log(change.doc.data());
       });
