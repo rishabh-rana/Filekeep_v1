@@ -1,0 +1,46 @@
+.authimg {
+  text-align: center;
+  margin-top: 100px;
+}
+
+.authimg img {
+  width: 300px;
+  cursor: pointer;
+}
+
+.authimg .subtext {
+  font-size: 15px;
+}
+.headlineauth {
+  width: 100%;
+  text-align: center;
+  color: #f8f9fa;
+  margin-top: 50px;
+  margin-bottom: 50px;
+  font-size: 60px;
+}
+
+* {
+  font-family: Quicksand !important;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

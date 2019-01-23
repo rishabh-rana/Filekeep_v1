@@ -1,0 +1,14 @@
+#navbarlogo {
+  width: 30px;
+  filter: grayscale(100%);
+}
+
+.abs-center-x {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.navbar {
+  min-height: 50px;
+}

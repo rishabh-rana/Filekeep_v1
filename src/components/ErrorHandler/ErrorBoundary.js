@@ -7,7 +7,7 @@ class ErrorBoundary extends React.Component {
   };
   //catch error from children
   componentDidCatch(error, info) {
-    console.log("yp");
+    // mixpanel.track("Application Crashed");
     this.setState({
       hasError: true
     });

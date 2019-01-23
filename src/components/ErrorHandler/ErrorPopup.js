@@ -36,6 +36,7 @@ const ErrorPopup = props => {
 class Popup extends React.Component {
   //Remove the popup after 'duration' miliseconds automatically
   componentDidMount() {
+    // mixpanel.track("Popup Appeared");
     setTimeout(() => {
       //calls dispatch(throwerror) witha null payload, setting error to null and removing the popup
       this.props.resolveError();
