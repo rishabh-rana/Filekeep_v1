@@ -1,13 +1,19 @@
 import React, { Component } from "react";
 
+//actions import
 import * as test from "./actions/test";
+
+//redux setup
 import { connect } from "react-redux";
 
+//component Imports
 import Test from "./components/test";
 
+//router setup
 import { BrowserRouter, Route } from "react-router-dom";
 
-import { firestore } from "./config/firebase";
+//Error Handlers
+import ErrorPopup from "./components/ErrorHandler/ErrorPopup";
 
 class App extends Component {
   componentDidMount() {
@@ -31,18 +37,20 @@ class App extends Component {
               />
             )}
           />
+          <ErrorPopup />
         </React.Fragment>
       </BrowserRouter>
     );
   }
 }
 
+//redux setup
 const mapstate = state => {
   return {
     unsubscribe: state.test.unsubscribe
   };
 };
-
+//default export
 export default connect(
   mapstate,
   { ...test }

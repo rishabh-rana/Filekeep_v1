@@ -8,6 +8,7 @@ export const testfunc = ub => {
       // console.log("unsub");
       ub();
     }
+
     var fakeinput = [["tag.Blog", "==", true]];
     var query = firestore.collection("docs");
 
@@ -28,7 +29,11 @@ export const testfunc = ub => {
         "ms from",
         source
       );
-      dispatch({ type: "unsub", payload: unsubscribe });
+      // dispatch({ type: "unsub", payload: unsubscribe });
+      dispatch({
+        type: "throwerror",
+        payload: { message: "this is an error", color: "red" }
+      });
     });
   };
 };
