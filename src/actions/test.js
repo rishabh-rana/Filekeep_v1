@@ -9,8 +9,11 @@ export const testfunc = ub => {
       ub();
     }
 
-    var fakeinput = [["tag.Blog", "==", true]];
-    var query = firestore.collection("docs");
+    var fakeinput = [["tag.Client", "==", 1]];
+    var query = firestore
+      .collection("containers")
+      .doc("wVVZdUYLCLHDC988MUMi")
+      .collection("nodes");
 
     for (var i in fakeinput) {
       query = query.where(fakeinput[i][0], fakeinput[i][1], fakeinput[i][2]);
@@ -29,25 +32,58 @@ export const testfunc = ub => {
         "ms from",
         source
       );
-      // dispatch({ type: "unsub", payload: unsubscribe });
-      dispatch({
-        type: "throwerror",
-        payload: { message: "this is an error", color: "red" }
-      });
+      dispatch({ type: "unsub", payload: unsubscribe });
     });
   };
 };
 
 export const writefunc = () => {
   return dispatch => {
-    firestore.collection("docs").add({
-      tag: {
-        design: true
-      },
-      parent: {
-        $$main: true
-      },
-      title: "Blog"
-    });
+    firestore
+      .collection("containers")
+      .doc("wVVZdUYLCLHDC988MUMi")
+      .update({
+        cached_taglist: [
+          {
+            t: "Frontend"
+          },
+          {
+            t: "Backend"
+          },
+          {
+            t: "Design"
+          },
+          {
+            t: "Learning Resources"
+          },
+          {
+            t: "Comments"
+          },
+          {
+            t: "Client"
+          },
+          {
+            t: "Website"
+          },
+          {
+            t: "Blog"
+          },
+          {
+            t: "Projects"
+          },
+          {
+            t: "User Reviews"
+          },
+          {
+            t: "Gantt Charts"
+          },
+          {
+            t: "Graphical View"
+          },
+          {
+            t: "toDo"
+          }
+        ]
+      });
   };
 };

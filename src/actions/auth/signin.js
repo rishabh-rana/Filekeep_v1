@@ -57,7 +57,7 @@ export const signout = () => {
 export const syncusers = () => {
   return dispatch => {
     auth.onAuthStateChanged(function(user) {
-      console.log(user);
+      // console.log(user);
       if (user) {
         let usersmall = {
           displayName: user.displayName,
