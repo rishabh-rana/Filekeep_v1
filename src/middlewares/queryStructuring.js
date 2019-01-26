@@ -14,7 +14,7 @@ export default ({ dispatch }) => next => action => {
   // set structure
 
   if (action.payload.str_by === "tag") {
-    const flippedMap = new Array(3);
+    const flippedMap = new Array();
     Object.keys(action.payload.data.tag).forEach(key => {
       flippedMap[action.payload.data.tag[key] - 1] = key;
     });
@@ -32,7 +32,8 @@ export default ({ dispatch }) => next => action => {
         break;
 
       case 2:
-      //later
+        //later
+        nodeMap = [flippedMap[3], flippedMap[1], flippedMap[0]];
     }
 
     dispatch({

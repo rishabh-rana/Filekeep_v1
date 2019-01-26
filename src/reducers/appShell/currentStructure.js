@@ -9,7 +9,9 @@ const reducer = (state = {}, action) => {
 
   if (action.type === "createStructure") {
     const nodeMap = action.payload.nodeMap;
-    const setMode = action.payload.action ? action.payload.id : null;
+    //tried deleting using this, not deleting structure, just adding 'null'
+    // const setMode = action.payload.action ? action.payload.id : null;
+    const setMode = action.payload.id;
     let replacer = cloneDeep(state[nodeMap[0]]) || null;
     let newObj = {};
 

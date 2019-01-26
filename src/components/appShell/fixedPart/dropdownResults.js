@@ -56,6 +56,7 @@ class DropDown extends React.Component {
       if (this.state.main.length !== 0 && this.state.main[this.state.active]) {
         var myTag = this.state.main[this.state.active].t;
         this.props.handleTagSelection(myTag);
+        document.getElementById("realInvisibleInputItem").scrollLeft = 100000;
       }
     }
   };

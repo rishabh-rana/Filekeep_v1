@@ -92,7 +92,8 @@ const buildQueryFromInput = (input, containerId, depth, hashtagsUsed) => {
     // }
     // var operatingIndice = firestoreQuery.length;
     //based on depth of query, depth of 2 => 2
-    firestoreQuery[primetag] = [queryBase, queryBase];
+    firestoreQuery[primetag] =
+      depth === 2 ? [queryBase, queryBase] : [queryBase, queryBase, queryBase];
 
     for (var i = 0; i < depth; i++) {
       firestoreQuery[primetag][i] = firestoreQuery[primetag][i].where(

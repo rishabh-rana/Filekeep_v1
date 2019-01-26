@@ -51,7 +51,7 @@ class QueryInput extends React.Component {
   // helper functions
 
   //handle initial quick results for first keystroke, while also rendering the Dropdown
-  handleFirstType = () => {
+  handleFirstType = e => {
     this.setState({
       turbo: true,
       inFocus: true
@@ -120,6 +120,8 @@ class QueryInput extends React.Component {
 
   handleKeyPress = e => {
     this.handleAutoScroll();
+    this.handleBackspace(e);
+    this.handleSpacebar(e);
   };
 
   //handle fuzzy search with fuse.js
@@ -199,8 +201,6 @@ class QueryInput extends React.Component {
       inputParser: newinputParser,
       matchedRecords: []
     });
-    //scroll input to end
-    document.getElementById("realInvisibleInputItem").scrollLeft = 100000;
   };
 
   //send query to firestore
@@ -289,22 +289,23 @@ class QueryInput extends React.Component {
         />
         <div className="input-group">
           <input
+            autoComplete="off"
             id="realInvisibleInputItem"
             className="form-control"
             style={{
               background: "transparent",
               zIndex: "2000",
-              wordSpacing: "0.05rem",
               color: "transparent",
-              caretColor: "black"
+              caretColor: "black",
+              fontWeight: "bold`"
             }}
             onKeyDown={e => {
-              this.handleBackspace(e);
-              this.handleSpacebar(e);
               this.handleKeyPress(e);
             }}
             onChange={e => this.handleChange(e)}
-            onFocus={this.handleFirstType}
+            onFocus={e => {
+              this.handleFirstType(e);
+            }}
             onBlur={this.handleBlur}
             value={this.state.inputParser.join(" ") + " " + this.state.input}
           />
@@ -317,15 +318,15 @@ class QueryInput extends React.Component {
             </button>
           </div>
         </div>
-        <DropList>
-          {(this.state.inFocus || this.state.inFocusoverride) && (
+        {(this.state.inFocus || this.state.inFocusoverride) && (
+          <DropList>
             <DropDown
               main={this.state.matchedRecords}
               handleTagSelection={this.handleTagSelection}
               handleinFocusOverride={this.handleinFocusOverride}
             />
-          )}
-        </DropList>
+          </DropList>
+        )}
       </div>
     );
   }

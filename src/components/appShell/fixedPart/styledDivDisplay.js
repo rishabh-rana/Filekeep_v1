@@ -6,22 +6,18 @@ import { queryFunctions } from "../../../appData/queryFunctions";
 const Word = styled.span`
   color: dodgerblue;
   font-weight: bold;
-  word-spacing: 0.05rem;
 `;
 
 const Function = styled.span`
   color: salmon;
   font-weight: bold;
-  word-spacing: 0.05rem;
 `;
 
 const Untagged = styled.span`
   color: black;
-  word-spacing: 0.05rem;
 `;
 
 const Scrollable = styled.div`
-  word-spacing: 0.05rem;
   overflow-x: scroll;
   white-space: nowrap;
   min-height: calc(100% + 20px);
