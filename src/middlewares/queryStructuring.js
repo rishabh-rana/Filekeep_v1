@@ -18,7 +18,7 @@ export default ({ dispatch }) => next => action => {
     Object.keys(action.payload.data.tag).forEach(key => {
       flippedMap[action.payload.data.tag[key] - 1] = key;
     });
-    console.log(flippedMap);
+    // console.log(flippedMap);
 
     var nodeMap;
 

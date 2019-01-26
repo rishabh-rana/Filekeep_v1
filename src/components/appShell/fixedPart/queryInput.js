@@ -1,16 +1,39 @@
 import React from "react";
-import styled, { css } from "styled-components";
+import DropDown from "./dropdownResults";
+import StyledDivDisplay from "./styledDivDisplay";
+
+import styled from "styled-components";
 
 import Fuse from "fuse.js";
 
+import { queryFunctionsFuse } from "../../../appData/queryFunctions";
+
+const DropList = styled.div`
+  display: block;
+  position: relative;
+  width: 100%;
+  z-index: 1000;
+`;
+
 class QueryInput extends React.Component {
+  //constants and state
+
+  //state description:
+  // input holds the current input foe processing and to semd query
+  // matchedRecords contain the records to be displayed in the dropdown, provided by fuse.js
+  // stopInterval : if to stop the setTimeout call on the input in case of unmount, used to ensure too uch processing doesnt take place
+  // turbo: set true by handleFirstType to get results of firt keystroke without any delay
+  // inFocus: determines if the input is in focus to Mount/ Unmount the DropDown
   state = {
     input: "",
+    inputParser: [],
     matchedRecords: [],
     stopInterval: null,
     turbo: false,
-    inFocus: false
+    inFocus: false,
+    listeningToScroll: false
   };
+  //fuse.js options
   options = {
     threshold: 0.1,
     location: 0,
@@ -18,10 +41,16 @@ class QueryInput extends React.Component {
     minMatchCharLength: 1,
     keys: ["t", "a"]
   };
+  // the fuse object, initialised as public property
   fuse = null;
+  //the number of results to be displayed in the dropdown
   numberofResults = 3;
+  // the dealy before the dropdownkist updates, for performance upgrades only
   matchDelay = 100;
 
+  // helper functions
+
+  //handle initial quick results for first keystroke, while also rendering the Dropdown
   handleFirstType = () => {
     this.setState({
       turbo: true,
@@ -29,15 +58,20 @@ class QueryInput extends React.Component {
     });
   };
 
+  //unmount DropDown by setting inFocus: false
   handleBlur = () => {
     this.setState({
       inFocus: false
     });
   };
 
+  //update input on state, ensure matching takes placeonly if there is no 'stopInterval' propoerty
+  //thus, while stopinterval exists on the tate, there is no new matches calculated
   handleChange = e => {
+    var char = e.target.value.split(" ");
+
     this.setState({
-      input: e.target.value,
+      input: char[char.length - 1],
       turbo: false
     });
     if (this.state.stopInterval === null) {
@@ -45,22 +79,79 @@ class QueryInput extends React.Component {
     }
   };
 
+  handleBackspace = e => {
+    if (e.key === "Backspace") {
+      e.preventDefault();
+      if (this.state.input === "") {
+        var newParser = [...this.state.inputParser];
+
+        if (newParser.length !== 0) newParser.pop();
+
+        this.setState({
+          inputParser: newParser
+        });
+      } else {
+        var newInput = this.state.input;
+        newInput = newInput.slice(0, newInput.length - 1);
+        this.setState({
+          input: newInput
+        });
+        if (this.state.stopInterval === null) {
+          this.handleMatching();
+        }
+      }
+    }
+  };
+
+  handleSpacebar = e => {
+    if (e.key === " ") {
+      e.preventDefault();
+      if (this.state.matchedRecords.length === 0) {
+        this.setState({
+          highlight: true
+        });
+      } else {
+        this.setState({
+          input: this.state.input + " "
+        });
+      }
+    }
+  };
+
+  handleKeyPress = e => {
+    this.handleAutoScroll();
+  };
+
+  //handle fuzzy search with fuse.js
+  //stopInterval ensures that only after ;matchDelay' milliseconds, the dropdown is calculated
   handleMatching = () => {
     var stopInterval = setTimeout(
       () => {
-        var queryArray = this.state.input.split(" ");
-        var query = queryArray[queryArray.length - 1];
+        // split input by spaces
+        // var queryArray = this.state.input.split(" ");
+        // take last word
+        // var query = queryArray[queryArray.length - 1];
+        //get matches for the last word
+        var match = this.fuse
+          .search(this.state.input)
+          .slice(0, this.numberofResults);
 
-        var match = this.fuse.search(query).slice(0, this.numberofResults);
-
-        if (match && match[0] && match[0].t === query) {
+        //if match is an exact match, remove the dropdown results, without setting stopinterval for quick unmount
+        if (match && match[0] && match[0].t === this.state.input) {
+          var newinput = "";
+          var newinputParser = [...this.state.inputParser, this.state.input];
           this.setState({
             matchedRecords: [],
+            input: newinput,
+            inputParser: newinputParser,
             stopInterval: null
           });
+          // exits to prevent calling setState below
           return;
         }
 
+        // if new matches are found, set them as new options, else just set stopInterval: null to ensure
+        //another match query can be made on the next keystroke
         if (match !== this.state.matchedRecords) {
           this.setState({
             matchedRecords: match,
@@ -72,14 +163,16 @@ class QueryInput extends React.Component {
           });
         }
       },
-      this.state.turbo ? 50 : this.matchDelay
+      this.state.turbo ? 20 : this.matchDelay
     );
+    //above ensure if turv=bo is on, only 20ms delay is done
 
+    // set stopeInterval !== null to prevent more queries to match from keystrokes
     this.setState({
       stopInterval: stopInterval
     });
   };
-
+  //stop matching current query
   stopMatching = () => {
     clearTimeout(this.state.stopInterval);
     this.setState({
@@ -87,43 +180,50 @@ class QueryInput extends React.Component {
     });
   };
 
+  //handle the tag selection from dropdown
   handleTagSelection = tag => {
-    var newinput = this.state.input.split(" ");
-    newinput.pop();
-    newinput.push(tag + " ");
-    var updatedInput = newinput.join(" ");
+    // split the input by spaces
+    // var newinput = this.state.input;
+    var newinputParser = [...this.state.inputParser];
+    // remove last word
+    // newinput.pop();
+    //add the entire tag with a space
+    // newinput.push(tag + " ");
+    newinputParser.push(tag);
+    // display results seperated by spaces
+    // var updatedInput = newinput.join(" ");
+    //update input for user, set matchedRecords to empty to unmount dropdown
+
     this.setState({
-      input: updatedInput,
+      input: "",
+      inputParser: newinputParser,
       matchedRecords: []
     });
+    //scroll input to end
+    document.getElementById("realInvisibleInputItem").scrollLeft = 100000;
   };
 
-  componentDidUpdate(newProps) {
-    if (newProps && newProps.cached_list !== this.props.cached_list) {
-      this.fuse = new Fuse(this.props.cached_list, this.options);
-    }
-  }
-
-  componentWillUnmount() {
-    this.stopMatching();
-  }
-
+  //send query to firestore
   sendQuery = () => {
+    //IMPORTANT
     //query, {augmentors} //ALWAYS DISPATCH Augmentor>Properties >>properties is important
 
-    //remove previou listeners
+    //remove previous listeners, the removeEventListener is an array of functions to be called
     if (this.props.removeEventListener) {
       this.props.removeEventListener.forEach(rmls => {
         rmls();
       });
     }
-
+    // flush current structure and data
     this.props.flushArchives();
 
-    this.props.sendQuery(this.state.input, {
+    //send fresh query, get properties from a master state obtained from user properties later
+    // also send across list of all hashtags used in current query
+    this.props.sendQuery(this.state.inputParser, {
       containerId: this.props.containerId,
       containerName: this.props.containerName,
       userDetails: this.props.userDetails,
+      hashtagsUsed: ["User Reviews", "Gantt Charts"],
       properties: {
         depth: 2,
         style: "list",
@@ -132,16 +232,81 @@ class QueryInput extends React.Component {
     });
   };
 
+  handleAutoScroll = () => {
+    if (
+      document &&
+      document.getElementById("realInvisibleInputItem") &&
+      document.getElementById("realInvisibleInputItem").scrollLeft !== 0 &&
+      this.state.listeningToScroll === false
+    ) {
+      const stopListen = setInterval(() => {
+        document.getElementById(
+          "styledDivScrollableElement"
+        ).scrollLeft = document.getElementById(
+          "realInvisibleInputItem"
+        ).scrollLeft;
+      }, 50);
+      this.setState({
+        listeningToScroll: stopListen
+      });
+    } else if (
+      document &&
+      document.getElementById("realInvisibleInputItem") &&
+      document.getElementById("realInvisibleInputItem").scrollLeft === 0 &&
+      this.state.listeningToScroll !== false
+    ) {
+      clearInterval(this.state.listeningToScroll);
+      this.setState({
+        listeningToScroll: false
+      });
+    }
+  };
+
+  //Lifecycle hooks
+
+  //prepare new fuse if new cached-list is obtained from server, with updated data
+  componentDidUpdate(newProps) {
+    if (newProps && newProps.cached_list !== this.props.cached_list) {
+      this.fuse = new Fuse(
+        [...this.props.cached_list, ...queryFunctionsFuse],
+        this.options
+      );
+    }
+  }
+  //stop matching and listening to scroll if unmounted
+  componentWillUnmount() {
+    this.stopMatching();
+    clearInterval(this.state.listeningToScroll);
+  }
+
+  //render call
   render() {
     return (
-      <div style={{ width: "100%" }}>
+      <div style={{ width: "100%", position: "relative" }}>
+        <StyledDivDisplay
+          display={this.state.inputParser}
+          displayInput={this.state.input}
+        />
         <div className="input-group">
           <input
+            id="realInvisibleInputItem"
             className="form-control"
+            style={{
+              background: "transparent",
+              zIndex: "2000",
+              wordSpacing: "0.05rem",
+              color: "transparent",
+              caretColor: "black"
+            }}
+            onKeyDown={e => {
+              this.handleBackspace(e);
+              this.handleSpacebar(e);
+              this.handleKeyPress(e);
+            }}
             onChange={e => this.handleChange(e)}
             onFocus={this.handleFirstType}
             onBlur={this.handleBlur}
-            value={this.state.input}
+            value={this.state.inputParser.join(" ") + " " + this.state.input}
           />
           <div className="input-group-append">
             <button
@@ -152,14 +317,7 @@ class QueryInput extends React.Component {
             </button>
           </div>
         </div>
-        <div
-          style={{
-            display: "block",
-            position: "relative",
-            width: "100%",
-            zIndex: "1000"
-          }}
-        >
+        <DropList>
           {(this.state.inFocus || this.state.inFocusoverride) && (
             <DropDown
               main={this.state.matchedRecords}
@@ -167,123 +325,9 @@ class QueryInput extends React.Component {
               handleinFocusOverride={this.handleinFocusOverride}
             />
           )}
-        </div>
+        </DropList>
       </div>
     );
   }
 }
 export default QueryInput;
-
-//Dropdown Class
-
-const DropItemTray = styled.div`
-  display: block;
-  position: absolute;
-  left: 0;
-  right: 0;
-  background: white;
-  margin-top: 3px;
-  border-radius: 0.25rem;
-  height: auto;
-  overflow: hidden;
-`;
-
-const DropItem = styled.div`
-  display: block;
-  width: 100%;
-  padding: 0.375rem 0.75rem;
-  line-height: 1.5;
-  height: calc(2.25rem + 2px);
-  cursor: pointer;
-
-  ${props =>
-    props.active &&
-    css`
-      background: lightblue;
-    `}
-`;
-
-class DropDown extends React.Component {
-  shouldComponentUpdate(nextProps, nextState) {
-    if (this.state.active !== nextState.active) {
-      return true;
-    }
-
-    if (this.state.main.length !== nextProps.main.length) {
-      return true;
-    }
-
-    if (this.state.main[0]) {
-      let flag = false;
-      for (var i in nextProps.main) {
-        if (nextProps.main[i].t !== this.state.main[i].t) {
-          flag = true;
-        }
-      }
-
-      return flag;
-    }
-
-    if (nextProps.main[0]) {
-      return true;
-    }
-
-    return false;
-  }
-
-  componentDidUpdate() {
-    if (this.state.main !== this.props.main) {
-      this.setState({
-        main: this.props.main,
-        active: 0
-      });
-    }
-  }
-
-  state = {
-    main: [],
-    active: 0
-  };
-
-  handleKeyboardInput = e => {
-    if (e.key === "ArrowDown" && this.state.active < 2) {
-      e.preventDefault();
-      this.setState({
-        active: this.state.active + 1
-      });
-    } else if (e.key === "ArrowUp" && this.state.active > 0) {
-      e.preventDefault();
-      this.setState({
-        active: this.state.active - 1
-      });
-    } else if (e.key === "Enter") {
-      // e.preventDefault();
-      if (this.state.main.length !== 0 && this.state.main[this.state.active]) {
-        var myTag = this.state.main[this.state.active].t;
-        this.props.handleTagSelection(myTag);
-      }
-    }
-  };
-
-  componentDidMount() {
-    document.addEventListener("keydown", this.handleKeyboardInput);
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener("keydown", this.handleKeyboardInput);
-  }
-
-  render() {
-    return (
-      <DropItemTray key={this.state.active}>
-        {this.state.main.map((item, index) => {
-          return (
-            <DropItem key={item.t} active={index === this.state.active}>
-              {item.t}
-            </DropItem>
-          );
-        })}
-      </DropItemTray>
-    );
-  }
-}

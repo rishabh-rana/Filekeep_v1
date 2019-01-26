@@ -25,7 +25,7 @@ const reducer = (state = {}, action) => {
       }
     } else if (action.payload.nodeMap.length === 2) {
       newObj[nodeMap[0]] = replacer;
-      console.log(newObj);
+      // console.log(newObj);
       if (
         newObj[nodeMap[0]] &&
         newObj[nodeMap[0]].child &&
