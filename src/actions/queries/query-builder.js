@@ -5,7 +5,7 @@ import { queryFunctions } from "../../appData/queryFunctions";
 const parseInputToTags = (input, hashtagsUsed) => {
   var mutatable = [...input];
   // queries to be executed, keys of queries object are the primeTags
-  var queries = {};
+  var queries = [];
 
   //break queries into seperate OR queries when "and" is followed by a parentTag
   //now while looping over queries object, "and" can be replaced with "with" tag
@@ -15,7 +15,8 @@ const parseInputToTags = (input, hashtagsUsed) => {
       if (word === "and") {
         if (hashtagsUsed.indexOf(mutatable[index + 1]) === -1) {
           //set queries.primetag = query (except primetag)
-          queries[mutatable[0]] = mutatable.slice(1, index);
+          queries.push({});
+          queries[queries.length - 1][mutatable[0]] = mutatable.slice(1, index);
           //remove query from mutatable
           mutatable = mutatable.slice(index + 1);
           return false;
@@ -31,23 +32,26 @@ const parseInputToTags = (input, hashtagsUsed) => {
     });
   }
   //set last remaining query to object
-  queries[mutatable[0]] = mutatable.slice(1);
+  queries.push({});
+  queries[queries.length - 1][mutatable[0]] = mutatable.slice(1);
 
   // console.log(queries);
 
-  Object.keys(queries).forEach(primeTag => {
-    var deStructure = {};
-    queries[primeTag].forEach((word, index) => {
-      if (queryFunctions.indexOf(word) !== -1) {
-        deStructure[word] = deStructure.hasOwnProperty(word)
-          ? [...deStructure[word], queries[primeTag][index + 1]]
-          : [queries[primeTag][index + 1]];
-      }
+  queries.forEach(query => {
+    Object.keys(query).map(primeTag => {
+      var deStructure = {};
+      query[primeTag].forEach((word, index) => {
+        if (queryFunctions.indexOf(word) !== -1) {
+          deStructure[word] = deStructure.hasOwnProperty(word)
+            ? [...deStructure[word], query[primeTag][index + 1]]
+            : [query[primeTag][index + 1]];
+        }
+      });
+      query[primeTag] = deStructure;
     });
-    queries[primeTag] = deStructure;
   });
 
-  // console.log(queries);
+  console.log(queries);
 
   return queries;
 };
@@ -78,9 +82,9 @@ const buildQueryFromInput = (input, containerId, depth, hashtagsUsed) => {
   //   return { queryList: query, primeTag: primeTag };
   // }
 
-  var firestoreQuery = {};
+  var firestoreQuery = [];
 
-  Object.keys(queries).forEach(primetag => {
+  queries.forEach(query => {
     // if (queries[primetag] === {}) {
     //   var operatingIndice = firestoreQuery.length;
     //   firestoreQuery.push(queryBase);
@@ -92,27 +96,30 @@ const buildQueryFromInput = (input, containerId, depth, hashtagsUsed) => {
     // }
     // var operatingIndice = firestoreQuery.length;
     //based on depth of query, depth of 2 => 2
-    firestoreQuery[primetag] =
-      depth === 2 ? [queryBase, queryBase] : [queryBase, queryBase, queryBase];
+    Object.keys(query).map(primetag => {
+      firestoreQuery.push({});
+      var operatingIndice = firestoreQuery.length - 1;
+      firestoreQuery[operatingIndice][primetag] =
+        depth === 2
+          ? [queryBase, queryBase]
+          : [queryBase, queryBase, queryBase];
+      console.log(firestoreQuery);
+      for (var i = 0; i < depth; i++) {
+        firestoreQuery[operatingIndice][primetag][i] = firestoreQuery[
+          operatingIndice
+        ][primetag][i].where("tag." + primetag, "==", i + 1);
 
-    for (var i = 0; i < depth; i++) {
-      firestoreQuery[primetag][i] = firestoreQuery[primetag][i].where(
-        "tag." + primetag,
-        "==",
-        i + 1
-      );
-
-      if (queries[primetag].hasOwnProperty("in")) {
-        queries[primetag].in.forEach((parentTag, parentindex) => {
-          firestoreQuery[primetag][i] = firestoreQuery[primetag][i].where(
-            "tag." + parentTag,
-            "==",
-            i + 2 + parentindex
-          );
-        });
+        if (query[primetag].hasOwnProperty("in")) {
+          query[primetag].in.forEach((parentTag, parentindex) => {
+            firestoreQuery[operatingIndice][primetag][i] = firestoreQuery[
+              operatingIndice
+            ][primetag][i].where("tag." + parentTag, "==", i + 2 + parentindex);
+          });
+        }
       }
-    }
+    });
   });
+  console.log(firestoreQuery);
 
   return firestoreQuery;
 };
@@ -122,7 +129,7 @@ export const sendQuery = (input, augmentors) => {
   return dispatch => {
     //refine augmentors : later
     //build query
-    let queryObject = buildQueryFromInput(
+    let queryList = buildQueryFromInput(
       input,
       augmentors.containerId,
       augmentors.properties.depth,
@@ -132,22 +139,23 @@ export const sendQuery = (input, augmentors) => {
     //execute query
     const removeListener = new Array();
 
-    Object.keys(queryObject).forEach(primetag => {
+    queryList.forEach(queryObject => {
       var operatingIndice = removeListener.length;
-
-      queryObject[primetag].forEach((query, i) => {
-        console.log(query);
-        removeListener[i + operatingIndice] = query.onSnapshot(snap => {
-          snap.docChanges().forEach(change => {
-            dispatch({
-              type: "realtimeUpdate",
-              payload: {
-                data: change.doc.data(),
-                type: change.type,
-                str_by: augmentors.properties.structureBy,
-                primeTag: primetag,
-                node_id: change.doc.id
-              }
+      Object.keys(queryObject).forEach(primetag => {
+        queryObject[primetag].forEach((query, i) => {
+          console.log(query);
+          removeListener[i + operatingIndice] = query.onSnapshot(snap => {
+            snap.docChanges().forEach(change => {
+              dispatch({
+                type: "realtimeUpdate",
+                payload: {
+                  data: change.doc.data(),
+                  type: change.type,
+                  str_by: augmentors.properties.structureBy,
+                  primeTag: primetag,
+                  node_id: change.doc.id
+                }
+              });
             });
           });
         });

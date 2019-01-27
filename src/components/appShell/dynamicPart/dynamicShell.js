@@ -6,7 +6,7 @@ const DyanamicShell = props => {
   if (!props.isLoadedFlag) {
     return <Loader />;
   }
-  console.log(props.currentStructure);
+  // console.log(props.currentStructure);
   return (
     <React.Fragment>
       {props.currentStructure &&

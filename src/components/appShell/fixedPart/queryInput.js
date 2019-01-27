@@ -6,7 +6,10 @@ import styled from "styled-components";
 
 import Fuse from "fuse.js";
 
-import { queryFunctionsFuse } from "../../../appData/queryFunctions";
+import {
+  queryFunctionsFuse,
+  queryFunctions
+} from "../../../appData/queryFunctions";
 
 const DropList = styled.div`
   display: block;
@@ -86,7 +89,10 @@ class QueryInput extends React.Component {
         var newParser = [...this.state.inputParser];
 
         if (newParser.length !== 0) newParser.pop();
-
+        this.handleFuserepair(
+          newParser[newParser.length - 1],
+          newParser[newParser.length - 2]
+        );
         this.setState({
           inputParser: newParser
         });
@@ -142,6 +148,7 @@ class QueryInput extends React.Component {
         if (match && match[0] && match[0].t === this.state.input) {
           var newinput = "";
           var newinputParser = [...this.state.inputParser, this.state.input];
+          this.handleFuserepair(this.state.input);
           this.setState({
             matchedRecords: [],
             input: newinput,
@@ -182,6 +189,45 @@ class QueryInput extends React.Component {
     });
   };
 
+  repairFuse = (filter, filterOn) => {
+    console.log(filter, filterOn);
+    if (filterOn === "in") {
+      var newOptions = this.props.cached_list.filter(
+        obj => obj.hasOwnProperty("c") && obj.c[filter]
+      );
+      console.log(newOptions);
+      this.fuse = new Fuse([...newOptions], this.options);
+    } else if (filterOn === "all") {
+      this.fuse = new Fuse(
+        [...this.props.cached_list, ...queryFunctionsFuse],
+        this.options
+      );
+    } else if (filterOn === "functionsOnly") {
+      this.fuse = new Fuse([...queryFunctionsFuse], this.options);
+    } else if (filterOn === "cachedListOnly") {
+      this.fuse = new Fuse([...this.props.cached_list], this.options);
+    }
+  };
+  //call before setting this.setState, hence last element of inputParser should be previous tag
+  handleFuserepair = (tag, optionalFilter) => {
+    if (tag === "") {
+      this.repairFuse(null, "all");
+    }
+
+    if (queryFunctions.indexOf(tag) === -1) {
+      this.repairFuse(null, "functionsOnly");
+    } else if (queryFunctions.indexOf(tag) !== -1 && tag !== "in") {
+      this.repairFuse(null, "cachedListOnly");
+    } else if (tag === "in") {
+      var filter = this.state.inputParser[this.state.inputParser.length - 1];
+      if (optionalFilter) filter = optionalFilter;
+      console.log(filter);
+      this.repairFuse(filter, "in");
+    } else {
+      this.repairFuse(null, "all");
+    }
+  };
+
   //handle the tag selection from dropdown
   handleTagSelection = tag => {
     // split the input by spaces
@@ -195,6 +241,7 @@ class QueryInput extends React.Component {
     // display results seperated by spaces
     // var updatedInput = newinput.join(" ");
     //update input for user, set matchedRecords to empty to unmount dropdown
+    this.handleFuserepair(tag);
 
     this.setState({
       input: "",
@@ -267,10 +314,7 @@ class QueryInput extends React.Component {
   //prepare new fuse if new cached-list is obtained from server, with updated data
   componentDidUpdate(newProps) {
     if (newProps && newProps.cached_list !== this.props.cached_list) {
-      this.fuse = new Fuse(
-        [...this.props.cached_list, ...queryFunctionsFuse],
-        this.options
-      );
+      this.fuse = new Fuse([...this.props.cached_list], this.options);
     }
   }
   //stop matching and listening to scroll if unmounted
