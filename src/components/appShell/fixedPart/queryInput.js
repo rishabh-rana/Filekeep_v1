@@ -89,10 +89,17 @@ class QueryInput extends React.Component {
         var newParser = [...this.state.inputParser];
 
         if (newParser.length !== 0) newParser.pop();
-        this.handleFuserepair(
-          newParser[newParser.length - 1],
-          newParser[newParser.length - 2]
-        );
+        console.log(newParser);
+        if (newParser.length === 0) {
+          console.log("here");
+          this.handleFuserepair(null);
+        } else {
+          this.handleFuserepair(
+            newParser[newParser.length - 1],
+            newParser[newParser.length - 2]
+          );
+        }
+
         this.setState({
           inputParser: newParser
         });
@@ -210,8 +217,14 @@ class QueryInput extends React.Component {
   };
   //call before setting this.setState, hence last element of inputParser should be previous tag
   handleFuserepair = (tag, optionalFilter) => {
+    // pass empty string for everything
     if (tag === "") {
       this.repairFuse(null, "all");
+    }
+    //pass null to move to intitial fuse
+    if (tag === null) {
+      this.repairFuse(null, "cachedListOnly");
+      return;
     }
 
     if (queryFunctions.indexOf(tag) === -1) {
