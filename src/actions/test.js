@@ -37,6 +37,22 @@ export const testfunc = ub => {
   };
 };
 
+export const testfunc2 = () => {
+  return dispatch => {
+    firestore
+      .collection("containers")
+      .doc("wVVZdUYLCLHDC988MUMi")
+      .collection("nodes")
+      .where("id", "==", "8")
+      .get()
+      .then(snap => {
+        snap.forEach(doc => {
+          console.log(doc.data());
+        });
+      });
+  };
+};
+
 export const writefunc = () => {
   return dispatch => {
     firestore

@@ -22,7 +22,7 @@ import ErrorPopup from "./components/ErrorHandler/ErrorPopup";
 class App extends Component {
   componentDidMount() {
     //getuser info maybe?
-
+    this.props.testfunc2();
     // console.log("establishing connection");
     // firestore.collection("users").onSnapshot(() => {}); connect to all the instances initially for ~5ms response time for all queries
     // firestore.collection("docs").onSnapshot(() => {});
