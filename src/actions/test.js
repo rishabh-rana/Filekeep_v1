@@ -9,15 +9,14 @@ export const testfunc = ub => {
       ub();
     }
 
-    var fakeinput = [["tag.Client", "==", 1]];
-    var query = firestore
-      .collection("containers")
-      .doc("wVVZdUYLCLHDC988MUMi")
-      .collection("nodes");
+    var fakeinput = [["687", ">", 0]];
+    var query = firestore.collection("trial");
 
     for (var i in fakeinput) {
       query = query.where(fakeinput[i][0], fakeinput[i][1], fakeinput[i][2]);
     }
+
+    query = query.orderBy("687");
 
     var benchmark = Date.now();
 

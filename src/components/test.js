@@ -4,6 +4,8 @@ import TextEditor from "./richTextEditor/editor";
 const Test = props => {
   return (
     <React.Fragment>
+      <span onClick={() => props.testfunc(props.unsubscribe)}>Get Data</span> ||
+      <span onClick={props.writefunc}>Write Data</span>
       <div className="container mt-5">
         <TextEditor />
       </div>
@@ -12,6 +14,3 @@ const Test = props => {
 };
 
 export default Test;
-
-// <span onClick={() => props.testfunc(props.unsubscribe)}>Get Data</span> ||
-//       <span onClick={props.writefunc}>Write Data</span>

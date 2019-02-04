@@ -8,7 +8,8 @@ import Fuse from "fuse.js";
 
 import {
   queryFunctionsFuse,
-  queryFunctions
+  queryFunctions,
+  queryFunctionsStart
 } from "../../../appData/queryFunctions";
 
 const DropList = styled.div`
@@ -207,12 +208,16 @@ class QueryInput extends React.Component {
     } else if (filterOn === "all") {
       this.fuse = new Fuse(
         [...this.props.cached_list, ...queryFunctionsFuse],
+        ...queryFunctionsStart,
         this.options
       );
     } else if (filterOn === "functionsOnly") {
       this.fuse = new Fuse([...queryFunctionsFuse], this.options);
     } else if (filterOn === "cachedListOnly") {
-      this.fuse = new Fuse([...this.props.cached_list], this.options);
+      this.fuse = new Fuse(
+        [...this.props.cached_list, ...queryFunctionsStart],
+        this.options
+      );
     }
   };
   //call before setting this.setState, hence last element of inputParser should be previous tag
@@ -279,11 +284,11 @@ class QueryInput extends React.Component {
 
     //send fresh query, get properties from a master state obtained from user properties later
     // also send across list of all hashtags used in current query
+
     this.props.sendQuery(this.state.inputParser, {
       containerId: this.props.containerId,
       containerName: this.props.containerName,
       userDetails: this.props.userDetails,
-      hashtagsUsed: ["User Reviews", "Gantt Charts"],
       properties: {
         depth: 2,
         style: "list",
@@ -327,7 +332,10 @@ class QueryInput extends React.Component {
   //prepare new fuse if new cached-list is obtained from server, with updated data
   componentDidUpdate(newProps) {
     if (newProps && newProps.cached_list !== this.props.cached_list) {
-      this.fuse = new Fuse([...this.props.cached_list], this.options);
+      this.fuse = new Fuse(
+        [...this.props.cached_list, ...queryFunctionsStart],
+        this.options
+      );
     }
   }
   //stop matching and listening to scroll if unmounted

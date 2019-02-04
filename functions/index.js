@@ -7,6 +7,7 @@ admin.initializeApp();
 
 exports.zendesk = functions.https.onRequest((req, res) => {
   //   check auth
+  console.log(req);
   admin
     .database()
     .ref("/keys/" + req.body.username)
@@ -15,7 +16,7 @@ exports.zendesk = functions.https.onRequest((req, res) => {
       if (pass !== req.body.password)
         return res.status(401).send({ message: "Unauthorized" });
     });
-
+  console.log("authorized");
   const { title, description, id, url } = req.body;
   var obj = {
     title: title,
@@ -28,7 +29,7 @@ exports.zendesk = functions.https.onRequest((req, res) => {
       [title]: 1
     }
   };
-
+  console.log("Request Obj", obj);
   admin
     .firestore()
     .collection("containers")
@@ -39,6 +40,7 @@ exports.zendesk = functions.https.onRequest((req, res) => {
     .then(snap => {
       snap.forEach(doc => {
         if (doc.exists) {
+          console.log("exists");
           return admin
             .firestore()
             .collection("containers")
@@ -48,6 +50,7 @@ exports.zendesk = functions.https.onRequest((req, res) => {
             .update(obj)
             .then(() => res.send({ message: "ok" }));
         } else {
+          console.log("new");
           return admin
             .firestore()
             .collection("containers")

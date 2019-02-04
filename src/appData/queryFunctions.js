@@ -16,15 +16,6 @@ export const queryFunctionsFuse = [
   },
   {
     t: "except"
-  },
-  {
-    t: "get"
-  },
-  {
-    t: "get me"
-  },
-  {
-    t: "find"
   }
 ];
 
@@ -37,6 +28,18 @@ export const queryFunctions = [
   "without",
   "except",
   "get",
-  "get me",
-  "find"
+  "add",
+  "create"
+];
+
+export const queryFunctionsStart = [
+  {
+    t: "get"
+  },
+  {
+    t: "add"
+  },
+  {
+    t: "create"
+  }
 ];

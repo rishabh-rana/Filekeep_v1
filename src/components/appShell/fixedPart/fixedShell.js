@@ -1,7 +1,7 @@
 import React from "react";
 import QueryInput from "./queryInput";
 
-import * as SendQuery from "../../../actions/queries/query-builder";
+import * as SendQuery from "../../../actions/queries/queryInitiator";
 import { connect } from "react-redux";
 
 const FixedShell = props => {
