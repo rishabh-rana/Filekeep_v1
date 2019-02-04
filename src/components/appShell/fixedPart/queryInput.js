@@ -2,6 +2,8 @@ import React from "react";
 import DropDown from "./dropdownResults";
 import StyledDivDisplay from "./styledDivDisplay";
 
+import MainBar from "./mainBar";
+
 import styled from "styled-components";
 
 import Fuse from "fuse.js";
@@ -55,7 +57,7 @@ class QueryInput extends React.Component {
   // helper functions
 
   //handle initial quick results for first keystroke, while also rendering the Dropdown
-  handleFirstType = e => {
+  handleFirstType = () => {
     this.setState({
       turbo: true,
       inFocus: true
@@ -72,10 +74,10 @@ class QueryInput extends React.Component {
   //update input on state, ensure matching takes placeonly if there is no 'stopInterval' propoerty
   //thus, while stopinterval exists on the tate, there is no new matches calculated
   handleChange = e => {
-    var char = e.target.value.split(" ");
+    var char = e.target.value;
 
     this.setState({
-      input: char[char.length - 1],
+      input: char,
       turbo: false
     });
     if (this.state.stopInterval === null) {
@@ -133,9 +135,13 @@ class QueryInput extends React.Component {
   };
 
   handleKeyPress = e => {
-    this.handleAutoScroll();
+    // this.handleAutoScroll();
     this.handleBackspace(e);
-    this.handleSpacebar(e);
+    // this.handleSpacebar(e);
+
+    // handle sending the query using enter
+    if (e.key === "Enter" && this.state.matchedRecords.length === 0)
+      this.sendQuery();
   };
 
   //handle fuzzy search with fuse.js
@@ -143,6 +149,33 @@ class QueryInput extends React.Component {
   handleMatching = () => {
     var stopInterval = setTimeout(
       () => {
+        if (
+          (this.state.inputParser[0] === "add" ||
+            this.state.inputParser[0] === "create") &&
+          this.state.input[0] === "'"
+        ) {
+          if (
+            this.state.input.length > 2 &&
+            this.state.input[this.state.input.length - 1] === "'"
+          ) {
+            var newParser = [...this.state.inputParser];
+            var newinput = this.state.input.slice(1);
+            newinput = newinput.slice(0, newinput.length - 1);
+            newParser.push(newinput);
+            this.handleFuserepair(newinput);
+            this.setState({
+              input: "",
+              inputParser: newParser,
+              stopInterval: null
+            });
+          } else {
+            this.setState({
+              stopInterval: null
+            });
+          }
+          return;
+        }
+
         // split input by spaces
         // var queryArray = this.state.input.split(" ");
         // take last word
@@ -155,6 +188,8 @@ class QueryInput extends React.Component {
         //if match is an exact match, remove the dropdown results, without setting stopinterval for quick unmount
         if (match && match[0] && match[0].t === this.state.input) {
           var newinput = "";
+          if (this.state.input === "add" || this.state.input === "create")
+            newinput = "'";
           var newinputParser = [...this.state.inputParser, this.state.input];
           this.handleFuserepair(this.state.input);
           this.setState({
@@ -237,6 +272,15 @@ class QueryInput extends React.Component {
     } else if (queryFunctions.indexOf(tag) !== -1 && tag !== "in") {
       this.repairFuse(null, "cachedListOnly");
     } else if (tag === "in") {
+      // handle create and add mode i.e. ommit the filter
+      if (
+        this.state.inputParser[this.state.inputParser.length - 2] === "add" ||
+        this.state.inputParser[this.state.inputParser.length - 2] === "create"
+      ) {
+        this.repairFuse(null, "cachedListOnly");
+        return;
+      }
+
       var filter = this.state.inputParser[this.state.inputParser.length - 1];
       if (optionalFilter) filter = optionalFilter;
       console.log(filter);
@@ -260,9 +304,10 @@ class QueryInput extends React.Component {
     // var updatedInput = newinput.join(" ");
     //update input for user, set matchedRecords to empty to unmount dropdown
     this.handleFuserepair(tag);
-
+    var newInput = "";
+    if (tag === "add" || tag === "create") newInput = "'";
     this.setState({
-      input: "",
+      input: newInput,
       inputParser: newinputParser,
       matchedRecords: []
     });
@@ -348,7 +393,30 @@ class QueryInput extends React.Component {
   render() {
     return (
       <div style={{ width: "100%", position: "relative" }}>
-        <StyledDivDisplay
+        <MainBar
+          inputParser={this.state.inputParser}
+          input={this.state.input}
+          handleLastBoxChange={this.handleChange}
+          handleFirstType={this.handleFirstType}
+          handleBlur={this.handleBlur}
+          handleKeyPress={this.handleKeyPress}
+        />
+        {(this.state.inFocus || this.state.inFocusoverride) && (
+          <DropList>
+            <DropDown
+              main={this.state.matchedRecords}
+              handleTagSelection={this.handleTagSelection}
+              handleinFocusOverride={this.handleinFocusOverride}
+            />
+          </DropList>
+        )}
+      </div>
+    );
+  }
+}
+export default QueryInput;
+
+/* <StyledDivDisplay
           display={this.state.inputParser}
           displayInput={this.state.input}
         />
@@ -382,18 +450,4 @@ class QueryInput extends React.Component {
               Search
             </button>
           </div>
-        </div>
-        {(this.state.inFocus || this.state.inFocusoverride) && (
-          <DropList>
-            <DropDown
-              main={this.state.matchedRecords}
-              handleTagSelection={this.handleTagSelection}
-              handleinFocusOverride={this.handleinFocusOverride}
-            />
-          </DropList>
-        )}
-      </div>
-    );
-  }
-}
-export default QueryInput;
+        </div> */
