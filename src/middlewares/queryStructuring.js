@@ -11,37 +11,53 @@ export default ({ dispatch }) => next => action => {
     dispatch({ type: "archiveDatafromRealtimeUpdate", payload: parcel });
   }
 
+  // find primeId
+
+  var primeId, primeTagDepth;
+
+  Object.keys(action.payload.data.tag).forEach(tag => {
+    if (tag === action.payload.primeTag)
+      primeTagDepth = action.payload.data.tag[tag];
+  });
+  console.log(primeTagDepth);
+
   // set structure
 
   if (action.payload.str_by === "tag") {
     const flippedMap = new Array();
-    Object.keys(action.payload.data.tag).forEach(key => {
-      flippedMap[action.payload.data.tag[key] - 1] = key;
-    });
+    if (action.payload.data.hasOwnProperty("tagids")) {
+      Object.keys(action.payload.data.tagids).forEach(nodeid => {
+        if (action.payload.data.tagids[nodeid] === primeTagDepth)
+          primeId = nodeid;
+        flippedMap[action.payload.data.tagids[nodeid] - 1] = nodeid;
+      });
+    }
+    flippedMap[0] = action.payload.node_id;
+
     // console.log(flippedMap);
 
     var nodeMap;
 
-    switch (flippedMap.indexOf(action.payload.primeTag)) {
-      case 0:
-        nodeMap = [flippedMap[1]];
+    switch (flippedMap.indexOf(primeId)) {
+      case -1:
+        nodeMap = [flippedMap[0]];
         break;
 
       case 1:
-        nodeMap = [flippedMap[2], flippedMap[0]];
+        nodeMap = [flippedMap[1], flippedMap[0]];
         break;
 
       case 2:
         //later
-        nodeMap = [flippedMap[3], flippedMap[1], flippedMap[0]];
+        nodeMap = [flippedMap[2], flippedMap[1], flippedMap[0]];
     }
-
+    console.log(nodeMap);
     dispatch({
-      type: "createStructure",
+      type: "createStructureCache",
       payload: {
         nodeMap: nodeMap,
-        id: action.payload.node_id,
-        action: action.payload.type === "removed" ? false : true
+        delete: action.payload.type === "removed" ? false : true,
+        id: action.payload.node_id
       }
     });
   }

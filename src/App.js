@@ -63,7 +63,7 @@ class App extends Component {
             component={() => (
               <AppShell
                 uid={this.props.auth.uid}
-                containerId={"wVVZdUYLCLHDC988MUMi"}
+                containerId={"N5vn6orUBklLfZ2aMw81"}
               />
             )}
           />

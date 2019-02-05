@@ -1,9 +1,9 @@
 const reducer = (state = {}, action) => {
   //do something
-  if (action.type === "archiveDatafromRealtimeUpdate") {
+
+  if (action.type === "removeEventListener") {
     return {
-      ...state,
-      ...action.payload
+      removeEventListener: action.payload
     };
   }
 

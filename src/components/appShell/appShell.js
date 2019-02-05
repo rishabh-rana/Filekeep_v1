@@ -7,6 +7,7 @@ import DynamicShell from "./dynamicPart/dynamicShell";
 
 import * as syncContainers from "../../actions/syncinginfo/syncContainer";
 import * as flushArchives from "../../actions/queries/flushDb";
+import * as BuildStructure from "../../actions/structuring/build";
 
 import { connect } from "react-redux";
 import WorkspaceShell from "./dynamicPart/workspaceShell";
@@ -14,10 +15,32 @@ import WorkspaceShell from "./dynamicPart/workspaceShell";
 // pass the userid and container id as props to this component
 
 class AppShell extends React.Component {
+  state = {
+    stopInterval: null
+  };
+
   componentDidMount() {
     //get the cachedList from a container
     //get container info
     this.props.syncContainer(this.props.containerId);
+
+    var stop = setInterval(() => {
+      if (
+        this.props.instructionStack &&
+        this.props.instructionStack.length > 0
+      ) {
+        console.log("fired building");
+        this.props.buildStructureFromInstructions(this.props.instructionStack);
+      }
+    }, 1);
+
+    this.setState({
+      stopInterval: stop
+    });
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.state.stopInterval);
   }
   render() {
     return (
@@ -47,6 +70,7 @@ class AppShell extends React.Component {
         <div className="col-9 mt-2">
           <DynamicShell
             currentStructure={this.props.currentStructure}
+            currentDataArchive={this.props.currentDataArchive}
             isLoadedFlag={this.props.container.name ? true : false}
           />
         </div>
@@ -59,8 +83,11 @@ const mapstate = state => {
   return {
     container: state.container,
     user: state.auth,
-    currentStructure: state.currentStructure,
-    removeEventListener: state.currentDataArchive.removeEventListener || null
+    instructionStack: state.currentStructure.stack,
+    currentStructure: state.currentStructure.structure,
+    currentDataArchive: state.currentDataArchive,
+    removeEventListener: state.removeListeners.removeEventListener || null,
+    readyToParse: state.currentStructure.readyToParse
   };
 };
 
@@ -68,6 +95,7 @@ export default connect(
   mapstate,
   {
     ...syncContainers,
-    ...flushArchives
+    ...flushArchives,
+    ...BuildStructure
   }
 )(AppShell);

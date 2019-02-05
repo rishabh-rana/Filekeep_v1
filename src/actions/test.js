@@ -46,59 +46,32 @@ export const testfunc2 = () => {
       .get()
       .then(snap => {
         snap.forEach(doc => {
-          console.log(doc.data());
+          // console.log(doc.data());
         });
       });
   };
 };
 
 export const writefunc = () => {
-  return dispatch => {
+  return async dispatch => {
+    // create a new compartment
+    const docref = await firestore.collection("containers").add({
+      cached_taglist: [{ t: "App" }],
+      name: "Trial Compartment"
+    });
+    // grab this id and put it in the app
+    console.log(docref.id);
+    // create a new node
     firestore
       .collection("containers")
-      .doc("wVVZdUYLCLHDC988MUMi")
-      .update({
-        cached_taglist: [
-          {
-            t: "Frontend"
-          },
-          {
-            t: "Backend"
-          },
-          {
-            t: "Design"
-          },
-          {
-            t: "Learning Resources"
-          },
-          {
-            t: "Comments"
-          },
-          {
-            t: "Client"
-          },
-          {
-            t: "Website"
-          },
-          {
-            t: "Blog"
-          },
-          {
-            t: "Projects"
-          },
-          {
-            t: "User Reviews"
-          },
-          {
-            t: "Gantt Charts"
-          },
-          {
-            t: "Graphical View"
-          },
-          {
-            t: "toDo"
-          }
-        ]
+      .doc(docref.id)
+      .collection("nodes")
+      .add({
+        app: "App",
+        tag: {
+          App: 1
+        },
+        title: "App"
       });
   };
 };

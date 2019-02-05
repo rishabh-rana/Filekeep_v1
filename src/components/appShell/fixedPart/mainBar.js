@@ -45,6 +45,7 @@ class MainBar extends React.Component {
             );
           })}
           <input
+            autoComplete="off"
             id="lastscrollablecontenteditable"
             style={{
               display: "inline-block",

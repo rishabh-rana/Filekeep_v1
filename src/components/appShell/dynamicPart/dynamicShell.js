@@ -6,6 +6,7 @@ const DyanamicShell = props => {
   if (!props.isLoadedFlag) {
     return <Loader />;
   }
+
   // console.log(props.currentStructure);
   return (
     <React.Fragment>
@@ -13,7 +14,7 @@ const DyanamicShell = props => {
         Object.keys(props.currentStructure).map(list => {
           return (
             <div
-              key={props.currentStructure[list].id}
+              key={list}
               style={{
                 background: "salmon",
                 width: "200px",
@@ -32,11 +33,10 @@ const DyanamicShell = props => {
                   padding: "5px"
                 }}
               >
-                {list}
+                {props.currentDataArchive[list].title}
               </div>
               {props.currentStructure[list] &&
-                props.currentStructure[list].child &&
-                Object.keys(props.currentStructure[list].child).map(card => {
+                Object.keys(props.currentStructure[list]).map(card => {
                   return (
                     <div
                       style={{
@@ -47,9 +47,9 @@ const DyanamicShell = props => {
                         padding: "5px",
                         borderRadius: "3px"
                       }}
-                      key={props.currentStructure[list].child[card].id}
+                      key={card}
                     >
-                      {card}
+                      {props.currentDataArchive[card].title}
                     </div>
                   );
                 })}

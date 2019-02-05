@@ -1,8 +1,21 @@
 import cloneDeep from "lodash/cloneDeep";
 
-const reducer = (state = {}, action) => {
+const reducer = (
+  state = {
+    stack: [],
+    structure: {},
+    readyToParse: false,
+    readyToParseHelper: null
+  },
+  action
+) => {
   if (action.type === "flushArchives") {
-    return {};
+    return {
+      stack: [],
+      structure: {},
+      readyToParse: false,
+      readyToParseHelper: null
+    };
   }
 
   //do something
@@ -58,6 +71,52 @@ const reducer = (state = {}, action) => {
     return {
       ...state,
       ...newObj
+    };
+  }
+
+  if (action.type === "createStructureCache") {
+    if (state.readyToParseHelper) clearTimeout(state.readyToParseHelper);
+    const helper = setTimeout(() => {
+      console.log("timedOut");
+      return {
+        ...state,
+        readyToParse: true,
+        readyToParseHelper: null
+      };
+    }, 50);
+    console.log(state);
+    const stacker = [...state.stack];
+    stacker.push({
+      instruction: action.payload.nodeMap,
+      isDelete: action.payload.delete
+    });
+    return {
+      ...state,
+      stack: stacker,
+      readyToParseHelper: helper
+    };
+  }
+
+  if (action.type === "buildStructure") {
+    var myTree = cloneDeep(state.structure);
+    if (action.payload.instruction.length === 1) {
+      myTree[action.payload.instruction[0]] = {};
+    } else if (action.payload.instruction.length === 2) {
+      myTree[action.payload.instruction[0]][action.payload.instruction[1]] = {};
+    }
+
+    return {
+      ...state,
+      structure: myTree
+    };
+  }
+
+  if (action.type === "clearStack") {
+    console.log(state);
+    return {
+      ...state,
+      readyToParse: false,
+      stack: []
     };
   }
 

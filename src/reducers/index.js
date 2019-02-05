@@ -7,6 +7,7 @@ import auth from "./auth";
 import container from "./appShell/container";
 import currentStructure from "./appShell/currentStructure";
 import currentDataArchive from "./appShell/currentDataArchive";
+import removeListeners from "./appShell/removeListeners";
 
 export default combineReducers({
   ui: ui,
@@ -15,5 +16,6 @@ export default combineReducers({
   auth: auth,
   container: container,
   currentStructure: currentStructure,
-  currentDataArchive: currentDataArchive
+  currentDataArchive: currentDataArchive,
+  removeListeners: removeListeners
 });

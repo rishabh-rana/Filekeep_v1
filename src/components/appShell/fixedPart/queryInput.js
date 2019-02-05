@@ -37,7 +37,10 @@ class QueryInput extends React.Component {
     stopInterval: null,
     turbo: false,
     inFocus: false,
-    listeningToScroll: false
+    fuseOn: {
+      cached_list: true,
+      queryFunctionsStart: true
+    }
   };
   //fuse.js options
   options = {
@@ -238,17 +241,47 @@ class QueryInput extends React.Component {
       var newOptions = this.props.cached_list.filter(
         obj => obj.hasOwnProperty("c") && obj.c[filter]
       );
-      console.log(newOptions);
+      // store details
+      this.setState({
+        fuseOn: {
+          cached_list: true,
+          filter: filter
+        }
+      });
       this.fuse = new Fuse([...newOptions], this.options);
     } else if (filterOn === "all") {
+      // store the fuse details
+      this.setState({
+        fuseOn: {
+          cached_list: true,
+          queryFunctionsFuse: true,
+          queryFunctionsStart: true
+        }
+      });
       this.fuse = new Fuse(
-        [...this.props.cached_list, ...queryFunctionsFuse],
-        ...queryFunctionsStart,
+        [
+          ...this.props.cached_list,
+          ...queryFunctionsFuse,
+          ...queryFunctionsStart
+        ],
         this.options
       );
     } else if (filterOn === "functionsOnly") {
+      this.setState({
+        fuseOn: {
+          queryFunctionsFuse: true
+        }
+      });
+
       this.fuse = new Fuse([...queryFunctionsFuse], this.options);
     } else if (filterOn === "cachedListOnly") {
+      this.setState({
+        fuseOn: {
+          queryFunctionsStart: true,
+          cached_list: true
+        }
+      });
+
       this.fuse = new Fuse(
         [...this.props.cached_list, ...queryFunctionsStart],
         this.options
@@ -330,6 +363,8 @@ class QueryInput extends React.Component {
     //send fresh query, get properties from a master state obtained from user properties later
     // also send across list of all hashtags used in current query
 
+    // sending cachedlist to all queries currently, edit to include only for create queries
+
     this.props.sendQuery(this.state.inputParser, {
       containerId: this.props.containerId,
       containerName: this.props.containerName,
@@ -338,7 +373,8 @@ class QueryInput extends React.Component {
         depth: 2,
         style: "list",
         structureBy: "tag"
-      }
+      },
+      cached_list: this.props.cached_list
     });
   };
 
@@ -376,11 +412,26 @@ class QueryInput extends React.Component {
 
   //prepare new fuse if new cached-list is obtained from server, with updated data
   componentDidUpdate(newProps) {
-    if (newProps && newProps.cached_list !== this.props.cached_list) {
-      this.fuse = new Fuse(
-        [...this.props.cached_list, ...queryFunctionsStart],
-        this.options
-      );
+    if (newProps && newProps.cached_list) {
+      var newopts = [];
+      var opts = this.state.fuseOn;
+      if (opts.cached_list === true && opts.hasOwnProperty("filter")) {
+        // handle it
+        var newOptions = newProps.cached_list.filter(
+          obj => obj.hasOwnProperty("c") && obj.c[opts.filter]
+        );
+        newopts = [...newOptions];
+      } else if (opts.cached_list === true) {
+        newopts = [...newopts, ...newProps.cached_list];
+      }
+      if (opts.queryFunctionsStart === true) {
+        newopts = [...newopts, ...queryFunctionsStart];
+      }
+      if (opts.queryFunctionsFuse === true) {
+        newopts = [...newopts, ...queryFunctionsFuse];
+      }
+
+      this.fuse = new Fuse(newopts, this.options);
     }
   }
   //stop matching and listening to scroll if unmounted

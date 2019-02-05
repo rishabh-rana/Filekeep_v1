@@ -3,20 +3,20 @@ import { firestore } from "../../config/firebase";
 export const syncContainer = containerId => {
   return async dispatch => {
     try {
-      const doc = await firestore
+      firestore
         .collection("containers")
         .doc(containerId)
-        .get();
-      let { name, teammates, cached_taglist } = doc.data();
-
-      dispatch({
-        type: "syncContainer",
-        payload: {
-          name: name,
-          teammates: teammates,
-          cached_list: cached_taglist
-        }
-      });
+        .onSnapshot(doc => {
+          let { name, teammates, cached_taglist } = doc.data();
+          dispatch({
+            type: "syncContainer",
+            payload: {
+              name: name,
+              teammates: teammates,
+              cached_list: cached_taglist
+            }
+          });
+        });
     } catch (error) {
       dispatch({
         type: "throwerror",
