@@ -2,8 +2,9 @@ export const buildStructureFromInstructions = stack => {
   return dispatch => {
     var bench = Date.now();
     const myStack = [...stack];
-
-    while (myStack.length > 0) {
+    var maxDepth = 1;
+    while (myStack.length > 0 && maxDepth < 5) {
+      maxDepth++;
       myStack.forEach((instruc, index) => {
         let err = null;
         try {
@@ -12,7 +13,7 @@ export const buildStructureFromInstructions = stack => {
           // if done, remove the instruction from stack
         } catch (error) {
           // continue loop
-          console.log("we are throwing error as well");
+          console.log(error);
           err = error;
         }
         // remove the successfull instruction from the stack

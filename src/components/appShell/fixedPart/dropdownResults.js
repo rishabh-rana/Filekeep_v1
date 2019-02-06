@@ -121,7 +121,7 @@ class DropDown extends React.Component {
       <DropItemTray key={this.state.active}>
         {this.state.main.map((item, index) => {
           return (
-            <DropItem key={item.t} active={index === this.state.active}>
+            <DropItem key={index} active={index === this.state.active}>
               {item.t}
             </DropItem>
           );

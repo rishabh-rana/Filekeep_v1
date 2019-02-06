@@ -88,7 +88,8 @@ const reducer = (
     const stacker = [...state.stack];
     stacker.push({
       instruction: action.payload.nodeMap,
-      isDelete: action.payload.delete
+      isDelete: action.payload.delete,
+      parentTagHelper: action.payload.parentTagHelper
     });
     return {
       ...state,
@@ -99,10 +100,29 @@ const reducer = (
 
   if (action.type === "buildStructure") {
     var myTree = cloneDeep(state.structure);
-    if (action.payload.instruction.length === 1) {
-      myTree[action.payload.instruction[0]] = {};
-    } else if (action.payload.instruction.length === 2) {
-      myTree[action.payload.instruction[0]][action.payload.instruction[1]] = {};
+
+    if (!action.payload.isDelete) {
+      console.log("hit this");
+      if (action.payload.instruction.length === 1) {
+        myTree[action.payload.instruction[0]] = {
+          parentTag: action.payload.parentTagHelper,
+          child: {}
+        };
+      } else if (action.payload.instruction.length === 2) {
+        myTree[action.payload.instruction[0]].child[
+          action.payload.instruction[1]
+        ] = {
+          child: {}
+        };
+      }
+    } else {
+      if (action.payload.instruction.length === 1) {
+        delete myTree[action.payload.instruction[0]];
+      } else if (action.payload.instruction.length === 2) {
+        delete myTree[action.payload.instruction[0]].child[
+          action.payload.instruction[1]
+        ];
+      }
     }
 
     return {

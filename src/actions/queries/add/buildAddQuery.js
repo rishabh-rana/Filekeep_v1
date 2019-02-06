@@ -142,8 +142,19 @@ export const buildQueryFromInput = async (
     };
 
     // handle cachelist addition
+
+    var shouldIPushNewEntryInCachedList = true;
+
     var cchelst = [...cached_list];
+
     cchelst.forEach((struc, i) => {
+      // dont push a new entry in list if tag already exist
+      if (struc.t === newTitle) {
+        shouldIPushNewEntryInCachedList = false;
+        // add parent tag
+        struc.p[parentInfoMain[0].title] = true;
+      }
+
       if (struc.t === parentInfoMain[0].title) {
         if (cchelst[i].c) {
           cchelst[i].c[newTitle] = true;
@@ -154,12 +165,16 @@ export const buildQueryFromInput = async (
         }
       }
     });
-    cchelst.push({
-      t: newTitle,
-      p: {
-        [parentInfoMain[0].title]: true
-      }
-    });
+
+    if (shouldIPushNewEntryInCachedList) {
+      cchelst.push({
+        t: newTitle,
+        p: {
+          [parentInfoMain[0].title]: true
+        }
+      });
+    }
+
     // cachedlist is mutated
 
     try {

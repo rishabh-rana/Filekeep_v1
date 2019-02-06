@@ -37,10 +37,16 @@ export default ({ dispatch }) => next => action => {
     // console.log(flippedMap);
 
     var nodeMap;
+    var parentTagHelper = null;
 
     switch (flippedMap.indexOf(primeId)) {
+      // primeId is not defined
       case -1:
+        // implies we must set the root node
         nodeMap = [flippedMap[0]];
+        Object.keys(action.payload.data.tag).forEach(tag => {
+          if (action.payload.data.tag[tag] === 2) parentTagHelper = tag;
+        });
         break;
 
       case 1:
@@ -51,13 +57,14 @@ export default ({ dispatch }) => next => action => {
         //later
         nodeMap = [flippedMap[2], flippedMap[1], flippedMap[0]];
     }
-    console.log(nodeMap);
+    console.log(parentTagHelper);
     dispatch({
       type: "createStructureCache",
       payload: {
         nodeMap: nodeMap,
-        delete: action.payload.type === "removed" ? false : true,
-        id: action.payload.node_id
+        delete: action.payload.type === "removed" ? true : false,
+        id: action.payload.node_id,
+        parentTagHelper: parentTagHelper
       }
     });
   }

@@ -33,10 +33,12 @@ const DyanamicShell = props => {
                   padding: "5px"
                 }}
               >
-                {props.currentDataArchive[list].title}
+                {props.currentStructure[list].parentTag ||
+                  props.currentDataArchive[list].title}
               </div>
               {props.currentStructure[list] &&
-                Object.keys(props.currentStructure[list]).map(card => {
+                props.currentStructure[list].child &&
+                Object.keys(props.currentStructure[list].child).map(card => {
                   return (
                     <div
                       style={{
