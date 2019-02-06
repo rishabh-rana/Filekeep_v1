@@ -32,12 +32,14 @@ export const sendGetQuery = (queries, augmentors, dispatch) => {
         // add callvack function to out array at last index
         removeListener[i + operatingIndice] = query.onSnapshot(snap => {
           // the snap object will betriggered at start and on every realtime update
+          // console.log(snap);
           snap.docChanges().forEach(change => {
             // doc changes container only nodes that have changed
 
             // dispatch an update down to middlewares!
             // middlewares require the following:
             // data, type of change, structuring by which tag, primetag for a query, node's id
+
             dispatch({
               type: "realtimeUpdate",
               payload: {

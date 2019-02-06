@@ -1,17 +1,17 @@
 import { parseInputToTags } from "./parseInput";
 import { sendGetQuery } from "./get/getQueryHandler";
-import { sendAddQuery } from "./add/addQueryHandler";
+import { sendCreateQuery } from "./add/createQueryHandler";
 
 export const sendQuery = (input, augmentors) => {
   return dispatch => {
     if (input[0] === "add") {
       // handle addition of data
+    } else if (input[0] === "create") {
+      // handle creating structure
       var removedCall = input.slice(1);
 
       var queries = parseInputToTags(removedCall);
-      sendAddQuery(queries, augmentors, dispatch);
-    } else if (input[0] === "create") {
-      // handle creating structure
+      sendCreateQuery(queries, augmentors, dispatch);
     } else {
       var removedCall = [...input];
       if (input[0] === "get") removedCall = removedCall.slice(1);

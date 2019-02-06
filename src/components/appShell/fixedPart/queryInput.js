@@ -95,9 +95,8 @@ class QueryInput extends React.Component {
         var newParser = [...this.state.inputParser];
 
         if (newParser.length !== 0) newParser.pop();
-        console.log(newParser);
+
         if (newParser.length === 0) {
-          console.log("here");
           this.handleFuserepair(null);
         } else {
           this.handleFuserepair(
@@ -236,7 +235,6 @@ class QueryInput extends React.Component {
   };
 
   repairFuse = (filter, filterOn) => {
-    console.log(filter, filterOn);
     if (filterOn === "in") {
       var newOptions = this.props.cached_list.filter(
         obj => obj.hasOwnProperty("c") && obj.c[filter]
@@ -316,7 +314,7 @@ class QueryInput extends React.Component {
 
       var filter = this.state.inputParser[this.state.inputParser.length - 1];
       if (optionalFilter) filter = optionalFilter;
-      console.log(filter);
+
       this.repairFuse(filter, "in");
     } else {
       this.repairFuse(null, "all");
@@ -352,13 +350,20 @@ class QueryInput extends React.Component {
     //query, {augmentors} //ALWAYS DISPATCH Augmentor>Properties >>properties is important
 
     //remove previous listeners, the removeEventListener is an array of functions to be called
-    if (this.props.removeEventListener) {
-      this.props.removeEventListener.forEach(rmls => {
-        rmls();
-      });
-    }
+
     // flush current structure and data
-    this.props.flushArchives();
+
+    if (
+      this.state.inputParser[0] !== "add" &&
+      this.state.inputParser[0] !== "create"
+    ) {
+      this.props.flushArchives();
+      if (this.props.removeEventListener) {
+        this.props.removeEventListener.forEach(rmls => {
+          rmls();
+        });
+      }
+    }
 
     //send fresh query, get properties from a master state obtained from user properties later
     // also send across list of all hashtags used in current query

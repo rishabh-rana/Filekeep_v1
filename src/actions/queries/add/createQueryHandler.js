@@ -1,9 +1,9 @@
 import { firestore } from "../../../config/firebase";
 
-import { buildQueryFromInput } from "./buildAddQuery";
+import { buildQueryFromInput } from "./buildCreateQuery";
 
 // main call
-export const sendAddQuery = (queries, augmentors, dispatch) => {
+export const sendCreateQuery = (queries, augmentors, dispatch) => {
   //refine augmentors : later
   //build query
   let queryList = buildQueryFromInput(

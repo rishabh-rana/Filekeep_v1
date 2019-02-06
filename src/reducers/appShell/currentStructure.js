@@ -77,14 +77,14 @@ const reducer = (
   if (action.type === "createStructureCache") {
     if (state.readyToParseHelper) clearTimeout(state.readyToParseHelper);
     const helper = setTimeout(() => {
-      console.log("timedOut");
+      // console.log("timedOut");
       return {
         ...state,
         readyToParse: true,
         readyToParseHelper: null
       };
     }, 50);
-    console.log(state);
+    // console.log(state);
     const stacker = [...state.stack];
     stacker.push({
       instruction: action.payload.nodeMap,
@@ -102,18 +102,29 @@ const reducer = (
     var myTree = cloneDeep(state.structure);
 
     if (!action.payload.isDelete) {
-      console.log("hit this");
+      // console.log("hit this");
+
       if (action.payload.instruction.length === 1) {
-        myTree[action.payload.instruction[0]] = {
-          parentTag: action.payload.parentTagHelper,
-          child: {}
-        };
+        // only update if no node exist currently
+        if (myTree.hasOwnProperty(action.payload.instruction[0]) === false) {
+          myTree[action.payload.instruction[0]] = {
+            parentTag: action.payload.parentTagHelper,
+            child: {}
+          };
+        }
       } else if (action.payload.instruction.length === 2) {
-        myTree[action.payload.instruction[0]].child[
-          action.payload.instruction[1]
-        ] = {
-          child: {}
-        };
+        // only update if no node exist currently
+        if (
+          myTree[action.payload.instruction[0]].child.hasOwnProperty(
+            action.payload.instruction[1]
+          ) === false
+        ) {
+          myTree[action.payload.instruction[0]].child[
+            action.payload.instruction[1]
+          ] = {
+            child: {}
+          };
+        }
       }
     } else {
       if (action.payload.instruction.length === 1) {
@@ -132,7 +143,7 @@ const reducer = (
   }
 
   if (action.type === "clearStack") {
-    console.log(state);
+    // console.log(state);
     return {
       ...state,
       readyToParse: false,

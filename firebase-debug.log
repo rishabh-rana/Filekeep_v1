@@ -1,0 +1,124 @@
+[debug] [2019-02-06T10:38:44.579Z] ----------------------------------------------------------------------
+[debug] [2019-02-06T10:38:44.587Z] Command:       /usr/local/bin/node /usr/local/bin/firebase deploy
+[debug] [2019-02-06T10:38:44.587Z] CLI Version:   6.3.0
+[debug] [2019-02-06T10:38:44.587Z] Platform:      linux
+[debug] [2019-02-06T10:38:44.587Z] Node Version:  v11.6.0
+[debug] [2019-02-06T10:38:44.620Z] Time:          Wed Feb 06 2019 16:08:44 GMT+0530 (India Standard Time)
+[debug] [2019-02-06T10:38:44.620Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2019-02-06T10:38:44.681Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2019-02-06T10:38:44.682Z] > authorizing via signed-in user
+[debug] [2019-02-06T10:38:44.682Z] [iam] checking project filekeep-v1 for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update","firebaserules.releases.create","firebaserules.releases.update","firebaserules.rulesets.create"]
+[debug] [2019-02-06T10:38:44.687Z] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] [2019-02-06T10:38:44.688Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+ <request body omitted>
+[debug] [2019-02-06T10:38:45.202Z] <<< HTTP RESPONSE 200
+[debug] [2019-02-06T10:38:45.249Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/filekeep-v1:testIamPermissions  
+
+[debug] [2019-02-06T10:38:47.350Z] <<< HTTP RESPONSE 200
+[debug] [2019-02-06T10:38:47.355Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/filekeep-v1  
+ 
+[debug] [2019-02-06T10:38:48.280Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Deploying to 'filekeep-v1'...
+[info] 
+[info] i  deploying storage, firestore, functions, hosting
+[debug] [2019-02-06T10:38:56.610Z] >>> HTTP REQUEST GET https://appengine.googleapis.com/v1/apps/filekeep-v1  
+ 
+[debug] [2019-02-06T10:38:58.952Z] <<< HTTP RESPONSE 200
+[info] i  storage: checking storage.rules for compilation errors...
+[debug] [2019-02-06T10:38:58.972Z] >>> HTTP REQUEST POST https://firebaserules.googleapis.com/v1/projects/filekeep-v1:test  
+
+[debug] [2019-02-06T10:39:01.199Z] <<< HTTP RESPONSE 200
+[info] ✔  storage: rules file storage.rules compiled successfully
+[info] i  firestore: checking firestore.rules for compilation errors...
+[info] i  firestore: reading indexes from firestore.indexes.json...
+[debug] [2019-02-06T10:39:01.227Z] >>> HTTP REQUEST POST https://firebaserules.googleapis.com/v1/projects/filekeep-v1:test  
+
+[debug] [2019-02-06T10:39:01.657Z] <<< HTTP RESPONSE 200
+[info] ✔  firestore: rules file firestore.rules compiled successfully
+[debug] [2019-02-06T10:39:01.663Z] > [functions] package.json contents: {
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "serve": "firebase serve --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "dependencies": {
+    "firebase-admin": "~6.0.0",
+    "firebase-functions": "^2.1.0"
+  },
+  "private": true
+}
+[info] i  functions: ensuring necessary APIs are enabled...
+[debug] [2019-02-06T10:39:01.666Z] >>> HTTP REQUEST GET https://servicemanagement.googleapis.com/v1/services/cloudfunctions.googleapis.com/projectSettings/filekeep-v1?view=CONSUMER_VIEW  
+ 
+[debug] [2019-02-06T10:39:01.669Z] >>> HTTP REQUEST GET https://servicemanagement.googleapis.com/v1/services/runtimeconfig.googleapis.com/projectSettings/filekeep-v1?view=CONSUMER_VIEW  
+ 
+[debug] [2019-02-06T10:39:04.379Z] <<< HTTP RESPONSE 200
+[debug] [2019-02-06T10:39:04.466Z] <<< HTTP RESPONSE 200
+[info] ✔  functions: all necessary APIs are enabled
+[debug] [2019-02-06T10:39:04.469Z] >>> HTTP REQUEST GET https://cloudresourcemanager.googleapis.com/v1/projects/filekeep-v1  
+ 
+[debug] [2019-02-06T10:39:06.240Z] <<< HTTP RESPONSE 200
+[debug] [2019-02-06T10:39:06.241Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/220518902541:getServerAppConfig  
+ 
+[debug] [2019-02-06T10:39:06.883Z] <<< HTTP RESPONSE 200
+[debug] [2019-02-06T10:39:06.889Z] >>> HTTP REQUEST POST https://firebasehosting.googleapis.com/v1beta1/sites/filekeep-v1/versions  
+
+[debug] [2019-02-06T10:39:09.347Z] <<< HTTP RESPONSE 500
+[debug] [2019-02-06T10:39:09.347Z] <<< HTTP RESPONSE BODY
+[error] 
+[error] Error: HTTP Error: 500, Internal error encountered.
+[debug] [2019-02-06T10:39:09.357Z] Error Context: {
+  "body": {
+    "error": {
+      "code": 500,
+      "message": "Internal error encountered.",
+      "status": "INTERNAL"
+    }
+  },
+  "response": {
+    "statusCode": 500,
+    "body": {
+      "error": {
+        "code": 500,
+        "message": "Internal error encountered.",
+        "status": "INTERNAL"
+      }
+    },
+    "headers": {
+      "vary": "X-Origin, Referer, Origin,Accept-Encoding",
+      "content-type": "application/json; charset=UTF-8",
+      "date": "Wed, 06 Feb 2019 10:39:42 GMT",
+      "server": "ESF",
+      "cache-control": "private",
+      "x-xss-protection": "1; mode=block",
+      "x-frame-options": "SAMEORIGIN",
+      "x-content-type-options": "nosniff",
+      "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39\"",
+      "accept-ranges": "none",
+      "transfer-encoding": "chunked"
+    },
+    "request": {
+      "uri": {
+        "protocol": "https:",
+        "slashes": true,
+        "auth": null,
+        "host": "firebasehosting.googleapis.com",
+        "port": 443,
+        "hostname": "firebasehosting.googleapis.com",
+        "hash": null,
+        "search": null,
+        "query": null,
+        "pathname": "/v1beta1/sites/filekeep-v1/versions",
+        "path": "/v1beta1/sites/filekeep-v1/versions",
+        "href": "https://firebasehosting.googleapis.com/v1beta1/sites/filekeep-v1/versions"
+      },
+      "method": "POST"
+    }
+  }
+}

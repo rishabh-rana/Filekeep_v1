@@ -19,7 +19,7 @@ export default ({ dispatch }) => next => action => {
     if (tag === action.payload.primeTag)
       primeTagDepth = action.payload.data.tag[tag];
   });
-  console.log(primeTagDepth);
+  // console.log(primeTagDepth);
 
   // set structure
 
@@ -57,7 +57,7 @@ export default ({ dispatch }) => next => action => {
         //later
         nodeMap = [flippedMap[2], flippedMap[1], flippedMap[0]];
     }
-    console.log(parentTagHelper);
+    // console.log(parentTagHelper);
     dispatch({
       type: "createStructureCache",
       payload: {
