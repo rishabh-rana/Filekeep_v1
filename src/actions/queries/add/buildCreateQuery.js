@@ -91,6 +91,8 @@ export const buildQueryFromInput = async (
       dispatch
     );
   });
+
+  return true;
 };
 
 // create query

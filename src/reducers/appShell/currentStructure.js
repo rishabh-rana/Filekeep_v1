@@ -3,9 +3,7 @@ import cloneDeep from "lodash/cloneDeep";
 const reducer = (
   state = {
     stack: [],
-    structure: {},
-    readyToParse: false,
-    readyToParseHelper: null
+    structure: {}
   },
   action
 ) => {
@@ -18,84 +16,20 @@ const reducer = (
     };
   }
 
-  //do something
-
-  if (action.type === "createStructure") {
-    const nodeMap = action.payload.nodeMap;
-    //tried deleting using this, not deleting structure, just adding 'null'
-    // const setMode = action.payload.action ? action.payload.id : null;
-    const setMode = action.payload.id;
-    let replacer = cloneDeep(state[nodeMap[0]]) || null;
-    let newObj = {};
-
-    if (action.payload.nodeMap.length === 1) {
-      newObj[nodeMap[0]] = replacer;
-
-      if (newObj[nodeMap[0]]) {
-        newObj[nodeMap[0]].id = setMode;
-      } else {
-        newObj[nodeMap[0]] = {
-          id: setMode
-        };
-      }
-    } else if (action.payload.nodeMap.length === 2) {
-      newObj[nodeMap[0]] = replacer;
-      // console.log(newObj);
-      if (
-        newObj[nodeMap[0]] &&
-        newObj[nodeMap[0]].child &&
-        newObj[nodeMap[0]].child[nodeMap[1]]
-      ) {
-        newObj[nodeMap[0]].child[nodeMap[1]].id = setMode;
-      } else if (newObj[nodeMap[0]] && newObj[nodeMap[0]].child) {
-        newObj[nodeMap[0]].child[nodeMap[1]] = {
-          id: setMode
-        };
-      } else if (newObj[nodeMap[0]]) {
-        newObj[nodeMap[0]].child = {
-          [nodeMap[1]]: {
-            id: setMode
-          }
-        };
-      } else {
-        newObj[nodeMap[0]] = {
-          child: {
-            [nodeMap[1]]: {
-              id: setMode
-            }
-          }
-        };
-      }
-    }
-
-    return {
-      ...state,
-      ...newObj
-    };
-  }
-
   if (action.type === "createStructureCache") {
-    if (state.readyToParseHelper) clearTimeout(state.readyToParseHelper);
-    const helper = setTimeout(() => {
-      // console.log("timedOut");
-      return {
-        ...state,
-        readyToParse: true,
-        readyToParseHelper: null
-      };
-    }, 50);
     // console.log(state);
     const stacker = [...state.stack];
-    stacker.push({
-      instruction: action.payload.nodeMap,
-      isDelete: action.payload.delete,
-      parentTagHelper: action.payload.parentTagHelper
-    });
-    return {
-      ...state,
-      stack: stacker,
-      readyToParseHelper: helper
-    };
+    if (action.payload.depth === 1) {
+      stacker.push({
+        instruction: action.payload.nodeMap,
+        isDelete: action.payload.delete,
+        parentTagHelper: action.payload.parentTagHelper
+      });
+      return {
+        ...state,
+        stack: stacker
+      };
+    }
   }
 
   if (action.type === "buildStructure") {

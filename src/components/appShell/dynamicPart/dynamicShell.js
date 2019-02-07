@@ -36,25 +36,34 @@ const DyanamicShell = props => {
                 {props.currentStructure[list].parentTag ||
                   props.currentDataArchive[list].title}
               </div>
-              {props.currentStructure[list] &&
-                props.currentStructure[list].child &&
-                Object.keys(props.currentStructure[list].child).map(card => {
-                  return (
-                    <div
-                      style={{
-                        background: "rgba(0,0,0,0.1)",
-                        width: "90%",
-                        minHeight: "25px",
-                        margin: "5px auto",
-                        padding: "5px",
-                        borderRadius: "3px"
-                      }}
-                      key={card}
-                    >
-                      {props.currentDataArchive[card].title}
-                    </div>
-                  );
-                })}
+              {props.currentDataArchive[list] &&
+                props.currentDataArchive[list].children &&
+                Object.keys(props.currentDataArchive[list].children).map(
+                  card => {
+                    // if info of this card is not in the archive, then ommit it
+                    // DO THIS LATER LATER
+                    return (
+                      <div
+                        style={{
+                          background: "rgba(0,0,0,0.1)",
+                          width: "90%",
+                          minHeight: "25px",
+                          margin: "5px auto",
+                          padding: "5px",
+                          borderRadius: "3px"
+                        }}
+                        key={card}
+                      >
+                        {props.currentDataArchive[
+                          props.currentDataArchive[list].children[card]
+                        ] &&
+                          props.currentDataArchive[
+                            props.currentDataArchive[list].children[card]
+                          ].title}
+                      </div>
+                    );
+                  }
+                )}
             </div>
           );
         })}

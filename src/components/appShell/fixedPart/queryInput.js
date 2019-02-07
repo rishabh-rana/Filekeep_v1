@@ -27,14 +27,14 @@ class QueryInput extends React.Component {
   //state description:
   // input holds the current input foe processing and to semd query
   // matchedRecords contain the records to be displayed in the dropdown, provided by fuse.js
-  // stopInterval : if to stop the setTimeout call on the input in case of unmount, used to ensure too uch processing doesnt take place
+  // stopDelayMatchingTimeout : if to stop the setTimeout call on the input in case of unmount, used to ensure too uch processing doesnt take place
   // turbo: set true by handleFirstType to get results of firt keystroke without any delay
   // inFocus: determines if the input is in focus to Mount/ Unmount the DropDown
   state = {
     input: "",
     inputParser: [],
     matchedRecords: [],
-    stopInterval: null,
+    stopDelayMatchingTimeout: null,
     turbo: false,
     inFocus: false,
     fuseOn: {
@@ -74,8 +74,8 @@ class QueryInput extends React.Component {
     });
   };
 
-  //update input on state, ensure matching takes placeonly if there is no 'stopInterval' propoerty
-  //thus, while stopinterval exists on the tate, there is no new matches calculated
+  //update input on state, ensure matching takes placeonly if there is no 'stopDelayMatchingTimeout' propoerty
+  //thus, while stopDelayMatchingTimeout exists on the tate, there is no new matches calculated
   handleChange = e => {
     var char = e.target.value;
 
@@ -83,7 +83,7 @@ class QueryInput extends React.Component {
       input: char,
       turbo: false
     });
-    if (this.state.stopInterval === null) {
+    if (this.state.stopDelayMatchingTimeout === null) {
       this.handleMatching();
     }
   };
@@ -114,32 +114,15 @@ class QueryInput extends React.Component {
         this.setState({
           input: newInput
         });
-        if (this.state.stopInterval === null) {
+        if (this.state.stopDelayMatchingTimeout === null) {
           this.handleMatching();
         }
       }
     }
   };
 
-  handleSpacebar = e => {
-    if (e.key === " ") {
-      e.preventDefault();
-      if (this.state.matchedRecords.length === 0) {
-        this.setState({
-          highlight: true
-        });
-      } else {
-        this.setState({
-          input: this.state.input + " "
-        });
-      }
-    }
-  };
-
   handleKeyPress = e => {
-    // this.handleAutoScroll();
     this.handleBackspace(e);
-    // this.handleSpacebar(e);
 
     // handle sending the query using enter
     if (e.key === "Enter" && this.state.matchedRecords.length === 0)
@@ -147,9 +130,9 @@ class QueryInput extends React.Component {
   };
 
   //handle fuzzy search with fuse.js
-  //stopInterval ensures that only after ;matchDelay' milliseconds, the dropdown is calculated
+  //stopDelayMatchingTimeout ensures that only after ;matchDelay' milliseconds, the dropdown is calculated
   handleMatching = () => {
-    var stopInterval = setTimeout(
+    var stopDelayMatchingTimeout = setTimeout(
       () => {
         if (
           (this.state.inputParser[0] === "add" ||
@@ -168,11 +151,11 @@ class QueryInput extends React.Component {
             this.setState({
               input: "",
               inputParser: newParser,
-              stopInterval: null
+              stopDelayMatchingTimeout: null
             });
           } else {
             this.setState({
-              stopInterval: null
+              stopDelayMatchingTimeout: null
             });
           }
           return;
@@ -187,7 +170,7 @@ class QueryInput extends React.Component {
           .search(this.state.input)
           .slice(0, this.numberofResults);
 
-        //if match is an exact match, remove the dropdown results, without setting stopinterval for quick unmount
+        //if match is an exact match, remove the dropdown results, without setting stopDelayMatchingTimeout for quick unmount
         if (match && match[0] && match[0].t === this.state.input) {
           var newinput = "";
           if (this.state.input === "add" || this.state.input === "create")
@@ -198,22 +181,22 @@ class QueryInput extends React.Component {
             matchedRecords: [],
             input: newinput,
             inputParser: newinputParser,
-            stopInterval: null
+            stopDelayMatchingTimeout: null
           });
           // exits to prevent calling setState below
           return;
         }
 
-        // if new matches are found, set them as new options, else just set stopInterval: null to ensure
+        // if new matches are found, set them as new options, else just set stopDelayMatchingTimeout: null to ensure
         //another match query can be made on the next keystroke
         if (match !== this.state.matchedRecords) {
           this.setState({
             matchedRecords: match,
-            stopInterval: null
+            stopDelayMatchingTimeout: null
           });
         } else {
           this.setState({
-            stopInterval: null
+            stopDelayMatchingTimeout: null
           });
         }
       },
@@ -223,14 +206,14 @@ class QueryInput extends React.Component {
 
     // set stopeInterval !== null to prevent more queries to match from keystrokes
     this.setState({
-      stopInterval: stopInterval
+      stopDelayMatchingTimeout: stopDelayMatchingTimeout
     });
   };
   //stop matching current query
   stopMatching = () => {
-    clearTimeout(this.state.stopInterval);
+    clearTimeout(this.state.stopDelayMatchingTimeout);
     this.setState({
-      stopInterval: null
+      stopDelayMatchingTimeout: null
     });
   };
 
@@ -383,36 +366,6 @@ class QueryInput extends React.Component {
     });
   };
 
-  handleAutoScroll = () => {
-    if (
-      document &&
-      document.getElementById("realInvisibleInputItem") &&
-      document.getElementById("realInvisibleInputItem").scrollLeft !== 0 &&
-      this.state.listeningToScroll === false
-    ) {
-      const stopListen = setInterval(() => {
-        document.getElementById(
-          "styledDivScrollableElement"
-        ).scrollLeft = document.getElementById(
-          "realInvisibleInputItem"
-        ).scrollLeft;
-      }, 50);
-      this.setState({
-        listeningToScroll: stopListen
-      });
-    } else if (
-      document &&
-      document.getElementById("realInvisibleInputItem") &&
-      document.getElementById("realInvisibleInputItem").scrollLeft === 0 &&
-      this.state.listeningToScroll !== false
-    ) {
-      clearInterval(this.state.listeningToScroll);
-      this.setState({
-        listeningToScroll: false
-      });
-    }
-  };
-
   //Lifecycle hooks
 
   //prepare new fuse if new cached-list is obtained from server, with updated data
@@ -439,10 +392,9 @@ class QueryInput extends React.Component {
       this.fuse = new Fuse(newopts, this.options);
     }
   }
-  //stop matching and listening to scroll if unmounted
+  //stop matching if unmounted
   componentWillUnmount() {
     this.stopMatching();
-    clearInterval(this.state.listeningToScroll);
   }
 
   //render call
@@ -471,39 +423,3 @@ class QueryInput extends React.Component {
   }
 }
 export default QueryInput;
-
-/* <StyledDivDisplay
-          display={this.state.inputParser}
-          displayInput={this.state.input}
-        />
-        <div className="input-group">
-          <input
-            autoComplete="off"
-            id="realInvisibleInputItem"
-            className="form-control"
-            style={{
-              background: "transparent",
-              zIndex: "2000",
-              color: "transparent",
-              caretColor: "black",
-              fontWeight: "bold`"
-            }}
-            onKeyDown={e => {
-              this.handleKeyPress(e);
-            }}
-            onChange={e => this.handleChange(e)}
-            onFocus={e => {
-              this.handleFirstType(e);
-            }}
-            onBlur={this.handleBlur}
-            value={this.state.inputParser.join(" ") + " " + this.state.input}
-          />
-          <div className="input-group-append">
-            <button
-              className="btn btn-outline-secondary"
-              onClick={this.sendQuery}
-            >
-              Search
-            </button>
-          </div>
-        </div> */

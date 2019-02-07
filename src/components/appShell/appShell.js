@@ -86,8 +86,7 @@ const mapstate = state => {
     instructionStack: state.currentStructure.stack,
     currentStructure: state.currentStructure.structure,
     currentDataArchive: state.currentDataArchive,
-    removeEventListener: state.removeListeners.removeEventListener || null,
-    readyToParse: state.currentStructure.readyToParse
+    removeEventListener: state.removeListeners.removeEventListener || null
   };
 };
 

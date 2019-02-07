@@ -19,7 +19,6 @@ export default ({ dispatch }) => next => action => {
     if (tag === action.payload.primeTag)
       primeTagDepth = action.payload.data.tag[tag];
   });
-  // console.log(primeTagDepth);
 
   // set structure
 
@@ -33,8 +32,6 @@ export default ({ dispatch }) => next => action => {
       });
     }
     flippedMap[0] = action.payload.node_id;
-
-    // console.log(flippedMap);
 
     var nodeMap;
     var parentTagHelper = null;
@@ -57,11 +54,12 @@ export default ({ dispatch }) => next => action => {
         //later
         nodeMap = [flippedMap[2], flippedMap[1], flippedMap[0]];
     }
-    // console.log(parentTagHelper);
+
     dispatch({
       type: "createStructureCache",
       payload: {
         nodeMap: nodeMap,
+        depth: primeTagDepth,
         delete: action.payload.type === "removed" ? true : false,
         id: action.payload.node_id,
         parentTagHelper: parentTagHelper
