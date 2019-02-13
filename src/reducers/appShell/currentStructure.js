@@ -80,7 +80,6 @@ const reducer = (
     // console.log(state);
     return {
       ...state,
-      readyToParse: false,
       stack: []
     };
   }

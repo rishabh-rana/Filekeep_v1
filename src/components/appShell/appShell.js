@@ -3,11 +3,12 @@ import React from "react";
 //component Imports
 
 import FixedShell from "./fixedPart/fixedShell";
-import DynamicShell from "./dynamicPart/dynamicShell";
+import DynamicShell from "./dynamicPart/react-beautiful-dnd";
 
 import * as syncContainers from "../../actions/syncinginfo/syncContainer";
 import * as flushArchives from "../../actions/queries/flushDb";
 import * as BuildStructure from "../../actions/structuring/build";
+import * as handleReactDndReorder from "../../actions/reorder/reorder";
 
 import { connect } from "react-redux";
 import WorkspaceShell from "./dynamicPart/workspaceShell";
@@ -72,6 +73,7 @@ class AppShell extends React.Component {
             currentStructure={this.props.currentStructure}
             currentDataArchive={this.props.currentDataArchive}
             isLoadedFlag={this.props.container.name ? true : false}
+            handleReactDndReorder={this.props.handleReactDndReorder}
           />
         </div>
       </div>
@@ -95,6 +97,7 @@ export default connect(
   {
     ...syncContainers,
     ...flushArchives,
-    ...BuildStructure
+    ...BuildStructure,
+    ...handleReactDndReorder
   }
 )(AppShell);

@@ -9,6 +9,7 @@
     "is-hotkey": "^0.1.4",
     "mixpanel-browser": "^2.26.0",
     "react": "^16.7.0",
+    "react-beautiful-dnd": "^10.0.4",
     "react-dom": "^16.7.0",
     "react-redux": "^6.0.0",
     "react-router": "^4.3.1",
