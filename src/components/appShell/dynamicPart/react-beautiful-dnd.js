@@ -7,16 +7,20 @@ const DyanamicShell = props => {
   if (!props.isLoadedFlag) {
     return <Loader />;
   }
-  console.log(props.currentDataArchive);
+
   return (
     <DragDropContext
       onDragEnd={result => {
         // handleing only within-list reordering
+        console.log(result);
         if (result.destination) {
           props.handleReactDndReorder(
             result,
             props.currentDataArchive[result.source.droppableId].children,
-            props.currentDataArchive[result.destination.droppableId].children
+            props.currentDataArchive[result.destination.droppableId].children,
+            props.containerId,
+            props.currentDataArchive[result.draggableId],
+            props.currentDataArchive[result.destination.droppableId]
           );
         }
       }}

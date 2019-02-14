@@ -74,6 +74,7 @@ class AppShell extends React.Component {
             currentDataArchive={this.props.currentDataArchive}
             isLoadedFlag={this.props.container.name ? true : false}
             handleReactDndReorder={this.props.handleReactDndReorder}
+            containerId={this.props.containerId}
           />
         </div>
       </div>
