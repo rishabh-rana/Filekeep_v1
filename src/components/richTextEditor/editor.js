@@ -135,6 +135,7 @@ class TextEditor extends React.Component {
         return "heading-five";
       case "######":
         return "heading-six";
+
       default:
         return null;
     }
@@ -207,6 +208,7 @@ class TextEditor extends React.Component {
         return <li {...attributes}>{children}</li>;
       case "numbered-list":
         return <ol {...attributes}>{children}</ol>;
+
       default:
         return next();
     }

@@ -53,7 +53,8 @@ export const handleReactDndReorder = (
         dispatch,
         draggableData,
         result.draggableId,
-        newParentData
+        newParentData,
+        result.destination.droppableId
       );
       var didItUpdate2 = await handleServerSync(
         containerId,
@@ -90,24 +91,26 @@ const move = (source, destination, droppableSource, droppableDestination) => {
 
 const handleServerSync = (
   containerId,
-  docId,
+  sourceParentId,
   items,
   dispatch,
   draggableData,
   draggableId,
-  newParentData
+  newParentData,
+  newParentId
 ) => {
   try {
     firestore
       .collection("containers")
       .doc(containerId)
       .collection("nodes")
-      .doc(docId)
+      .doc(sourceParentId)
       .update({
         children: items
       });
 
     if (draggableData) {
+      console.log("we are live");
       var data = cloneDeep(newParentData);
       Object.keys(data.tag).forEach(tag => {
         data.tag[tag] = data.tag[tag] + 1;
@@ -121,7 +124,7 @@ const handleServerSync = (
           primeTag = tag;
         }
       });
-      if (isStructural) {
+      if (!isStructural) {
         data.tag[primeTag] = 1;
       }
       // update tagids
@@ -129,13 +132,13 @@ const handleServerSync = (
         data.tagids[tagid] = data.tagids[tagid] + 1;
       });
       // add parent tagid
-      data.tagids[docId] = 2;
+      data.tagids[newParentId] = 2;
 
       firestore
         .collection("containers")
         .doc(containerId)
         .collection("nodes")
-        .doc(draggableId)
+        .doc(draggableId.slice(0, 20))
         .update({
           tag: data.tag,
           tagids: data.tagids
