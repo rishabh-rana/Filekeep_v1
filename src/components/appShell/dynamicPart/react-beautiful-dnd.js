@@ -114,6 +114,7 @@ const DyanamicShell = props => {
                       containerId={props.containerId}
                       parentId={list}
                       parentInfo={props.currentDataArchive[list]}
+                      isStructural={false}
                     />
                   </div>
                 )}

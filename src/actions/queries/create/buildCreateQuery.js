@@ -204,11 +204,13 @@ const writeToaParent = async (
   // execution of query
   try {
     // add new node
-    var docref = await firestore
+    var docref = firestore
       .collection("containers")
       .doc(containerId)
       .collection("nodes")
-      .add(requestObj);
+      .doc();
+
+    docref.set(requestObj);
 
     // update cached_list
     firestore

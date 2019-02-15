@@ -8,7 +8,6 @@ export const buildQueryFromInput = async (
   parentinfo,
   dispatch
 ) => {
-  console.log("START", Date.now());
   //extract first query, only one add query is allowed at a time
   var newTitle;
   var location;
@@ -24,7 +23,6 @@ export const buildQueryFromInput = async (
   var parentInfoMain = [parentinfo];
   // if parentinfo is not passed in, get the required details
   if (!parentinfo) {
-    console.log("using the cloud for parent");
     // build a query and retrieve parent info
     var getParents = firestore
       .collection("containers")

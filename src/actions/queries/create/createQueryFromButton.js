@@ -1,6 +1,6 @@
-import { buildQueryFromInput } from "./buildAddQuery";
+import { buildQueryFromInput } from "./buildCreateQuery";
 
-export const sendAddQueryFromButton = (
+export const sendCreateQueryFromButton = (
   query,
   containerId,
   cached_list,

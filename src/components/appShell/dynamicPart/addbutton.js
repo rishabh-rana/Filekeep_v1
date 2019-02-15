@@ -1,9 +1,10 @@
 import React from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 import { connect } from "react-redux";
 
-import * as actions from "../../../actions/queries/add/addQueryFromButton";
+import * as action1 from "../../../actions/queries/add/addQueryFromButton";
+import * as action2 from "../../../actions/queries/create/createQueryFromButton";
 
 const Button = styled.div`
   width: 95%;
@@ -14,6 +15,12 @@ const Button = styled.div`
   text-align: center;
   border-radius: 5px;
   cursor: pointer;
+
+  ${props =>
+    props.structural &&
+    css`
+      background: yellowgreen;
+    `}
 `;
 
 const InputAdder = styled.input`
@@ -53,10 +60,19 @@ class AddButton extends React.Component {
           containerId={this.props.containerId}
           cached_list={this.props.cached_list}
           sendQueryFromButton={this.props.sendQueryFromButton}
+          sendCreateQueryFromButton={this.props.sendCreateQueryFromButton}
+          isStructural={this.props.isStructural}
         />
       );
     }
-    return <Button onClick={this.handleClick}>{content}</Button>;
+    return (
+      <Button
+        structural={this.props.isStructural || false}
+        onClick={this.handleClick}
+      >
+        {content}
+      </Button>
+    );
   }
 }
 
@@ -69,7 +85,8 @@ const mapstate = state => {
 export default connect(
   mapstate,
   {
-    ...actions
+    ...action1,
+    ...action2
   }
 )(AddButton);
 
@@ -86,32 +103,58 @@ class Input extends React.Component {
     });
   };
 
-  prepareQuery = () => {
+  prepareParentinfo = () => {
     var requiredParentInfo = {};
     requiredParentInfo.id = this.props.parentId;
     requiredParentInfo.tag = this.props.parentInfo.tag;
     requiredParentInfo.tagid = this.props.parentInfo.tagids;
     requiredParentInfo.title = this.props.parentInfo.title;
     requiredParentInfo.children = this.props.parentInfo.children;
-    // constructed the parentinfo
+    return requiredParentInfo;
+  };
 
-    //contruct 'in' array
-
+  prepareInArray = () => {
     var inArray = new Array();
     Object.keys(this.props.parentInfo.tag).forEach(tag => {
       inArray[this.props.parentInfo.tag[tag] - 1] = tag;
     });
 
+    return inArray;
+  };
+
+  prepareQuery = () => {
+    if (this.props.isStructural) {
+      this.prepareCreateQuery();
+    } else {
+      this.prepareAddQuery();
+    }
+  };
+
+  prepareCreateQuery = () => {
     var query = {};
     query[this.state.text] = {
-      in: inArray
+      in: this.prepareInArray()
     };
 
-    this.props.sendQueryFromButton(
+    this.props.sendCreateQueryFromButton(
       [query],
       this.props.containerId,
       this.props.cached_list,
-      requiredParentInfo
+      this.prepareParentinfo()
+    );
+  };
+
+  prepareAddQuery = () => {
+    var query = {};
+    query[this.state.text] = {
+      in: this.prepareInArray()
+    };
+
+    this.props.sendAddQueryFromButton(
+      [query],
+      this.props.containerId,
+      this.props.cached_list,
+      this.prepareParentinfo()
     );
   };
 
