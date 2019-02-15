@@ -10,7 +10,7 @@ export const sendAddQuery = (queries, augmentors, dispatch) => {
     queries,
     augmentors.containerId,
     augmentors.cached_list,
-    augmentors.parents,
+    null,
     dispatch
   );
 };

@@ -1,6 +1,7 @@
 import React from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import styled from "styled-components";
+import AddButton from "./addbutton";
 
 import Loader from "../../UI/loader/loader";
 
@@ -108,6 +109,12 @@ const DyanamicShell = props => {
                         }
                       )}
                     {provided.placeholder}
+
+                    <AddButton
+                      containerId={props.containerId}
+                      parentId={list}
+                      parentInfo={props.currentDataArchive[list]}
+                    />
                   </div>
                 )}
               </Droppable>
